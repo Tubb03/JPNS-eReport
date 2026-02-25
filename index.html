@@ -3,6 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>JPNS-eReport - Submit</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
@@ -18,24 +19,25 @@
                 class="w-full p-2 border rounded focus:ring-2 focus:ring-blue-400 outline-none">
 
             <select id="unit" class="w-full p-2 border rounded bg-white">
-                <option value="Unit A">Unit A</option>
-                <option value="Unit B">Unit B</option>
-                <option value="Unit C">Unit C</option>
-                <option value="Unit D">Unit D</option>
+                <option value="Academic Unit">Academic Unit</option>
+                <option value="Student Affairs Unit">Student Affairs Unit</option>
+                <option value="Management Unit">Management Unit</option>
+                <option value="ICT Unit">ICT Unit</option>
             </select>
 
             <input type="date" id="programDate" required class="w-full p-2 border rounded">
 
-            <textarea id="description" rows="3" placeholder="Briefly describe the activity..."
+            <textarea id="description" rows="3" placeholder="Briefly describe the activity highlights..."
                 class="w-full p-2 border rounded focus:ring-2 focus:ring-blue-400 outline-none"></textarea>
 
-            <div class="bg-gray-50 p-4 rounded-lg border border-dashed border-gray-300">
-                <label class="block text-sm font-medium text-gray-600 mb-2">Upload Program Photo</label>
-                <input type="file" id="imageUpload" accept="image/*" class="w-full text-sm text-gray-500">
+            <div class="bg-blue-50 p-4 rounded-lg border-2 border-dashed border-blue-200">
+                <label class="block text-sm font-bold text-blue-700 mb-2">Upload Program Photos (Multiple)</label>
+                <input type="file" id="imageUpload" accept="image/*" multiple
+                    class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-700 cursor-pointer">
             </div>
 
             <button type="submit" id="btn"
-                class="w-full bg-blue-600 text-white py-3 rounded-lg font-bold hover:bg-blue-700 transition">Upload
+                class="w-full bg-blue-600 text-white py-3 rounded-lg font-bold hover:bg-blue-700 transition shadow-lg">Upload
                 Report</button>
         </form>
 
@@ -66,16 +68,20 @@
         document.getElementById('reportForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const btn = document.getElementById('btn');
-            btn.disabled = true; btn.innerText = "Uploading... Please wait";
+            const files = document.getElementById('imageUpload').files;
 
-            const file = document.getElementById('imageUpload').files[0];
-            let url = "";
+            btn.disabled = true;
+            btn.innerText = `Uploading ${files.length} images...`;
+
+            let urls = [];
 
             try {
-                if (file) {
-                    const sRef = ref(storage, `images/${Date.now()}_${file.name}`);
-                    await uploadBytes(sRef, file);
-                    url = await getDownloadURL(sRef);
+                // Loop through multiple files
+                for (let i = 0; i < files.length; i++) {
+                    const sRef = ref(storage, `images/${Date.now()}_${files[i].name}`);
+                    await uploadBytes(sRef, files[i]);
+                    const downloadUrl = await getDownloadURL(sRef);
+                    urls.push(downloadUrl);
                 }
 
                 await addDoc(collection(db, "reports"), {
@@ -84,16 +90,17 @@
                     unit: document.getElementById('unit').value,
                     date: document.getElementById('programDate').value,
                     description: document.getElementById('description').value,
-                    imageUrl: url,
+                    imageUrls: urls,
                     createdAt: new Date()
                 });
 
-                alert("Report Successfully Submitted!");
+                alert("Success! Report saved with " + urls.length + " images.");
                 location.reload();
             } catch (err) {
                 console.error(err);
-                alert("Error submitting report. Check console.");
-                btn.disabled = false; btn.innerText = "Upload Report";
+                alert("Upload failed. Try smaller images.");
+                btn.disabled = false;
+                btn.innerText = "Upload Report";
             }
         });
     </script>

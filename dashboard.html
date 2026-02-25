@@ -5,33 +5,55 @@
     <meta charset="UTF-8">
     <title>JPNS-eReport - Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @media print {
+            .no-print {
+                display: none !important;
+            }
+
+            body {
+                background: white;
+            }
+
+            .report-card {
+                break-inside: avoid;
+                border: 1px solid #eee;
+                margin-bottom: 2rem;
+                box-shadow: none !important;
+            }
+
+            .gallery-grid {
+                grid-template-columns: repeat(2, 1fr) !important;
+            }
+        }
+    </style>
 </head>
 
 <body class="bg-gray-100 p-6">
     <div class="max-w-6xl mx-auto">
-        <div class="flex flex-col md:flex-row justify-between items-center mb-10 gap-4">
+        <div class="flex flex-col md:flex-row justify-between items-center mb-10 gap-4 no-print">
             <div>
                 <h1 class="text-3xl font-black text-blue-900 italic">JPNS-eReport</h1>
                 <p class="text-gray-500">Activity Monitoring Dashboard</p>
             </div>
 
             <div class="flex gap-4 items-center">
-                <label class="text-sm font-bold text-gray-600">Filter:</label>
                 <select id="filterUnit"
                     class="p-2 border rounded-lg bg-white shadow-sm outline-none focus:ring-2 focus:ring-blue-400">
                     <option value="All">All Units</option>
-                    <option value="Unit A">Unit A</option>
-                    <option value="Unit B">Unit B</option>
-                    <option value="Unit C">Unit C</option>
-                    <option value="Unit D">Unit D</option>
+                    <option value="Academic Unit">Academic Unit</option>
+                    <option value="Student Affairs Unit">Student Affairs Unit</option>
+                    <option value="Management Unit">Management Unit</option>
+                    <option value="ICT Unit">ICT Unit</option>
                 </select>
                 <a href="index.html"
-                    class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 font-bold shadow-md">+ New
-                    Report</a>
+                    class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 font-bold shadow-md">+ New</a>
+                <button onclick="window.print()"
+                    class="bg-slate-700 text-white px-4 py-2 rounded-lg font-bold">Print/PDF</button>
             </div>
         </div>
 
-        <div id="gallery" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div id="gallery" class="grid grid-cols-1 md:grid-cols-2 gap-8">
         </div>
     </div>
 
@@ -60,31 +82,48 @@
 
             const render = (dataList) => {
                 if (dataList.length === 0) {
-                    gallery.innerHTML = '<p class="text-gray-400 italic col-span-full text-center py-10">No reports found for this unit.</p>';
+                    gallery.innerHTML = '<p class="col-span-full text-center text-gray-400 py-10 italic">No reports found.</p>';
                     return;
                 }
 
-                gallery.innerHTML = dataList.map(item => `
-                    <div class="bg-white rounded-xl shadow-md overflow-hidden border border-gray-200 flex flex-col">
-                        <img src="${item.imageUrl || 'https://via.placeholder.com/400x250?text=No+Image'}" class="w-full h-52 object-cover">
-                        <div class="p-5 flex-grow">
-                            <div class="flex justify-between items-start mb-2">
-                                <span class="text-[10px] font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded-md uppercase tracking-wider">${item.unit}</span>
-                                <span class="text-[11px] text-gray-400 font-medium">${item.date}</span>
+                gallery.innerHTML = dataList.map(item => {
+                    const imgs = item.imageUrls || [];
+                    const imageGrid = imgs.map(url => `
+                        <img src="${url}" class="w-full h-32 object-cover rounded-lg border shadow-sm cursor-zoom-in" onclick="window.open('${url}')">
+                    `).join('');
+
+                    const downloadLinks = imgs.map((url, idx) => `
+                        <a href="${url}" target="_blank" class="text-[10px] bg-green-50 text-green-700 border border-green-200 px-2 py-1 rounded hover:bg-green-100 transition">Img ${idx + 1} ↓</a>
+                    `).join('');
+
+                    return `
+                        <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 report-card flex flex-col">
+                            <div class="flex justify-between items-start mb-4">
+                                <div>
+                                    <span class="text-[10px] font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded uppercase tracking-widest">${item.unit}</span>
+                                    <h3 class="font-bold text-2xl text-slate-800 mt-2 leading-tight">${item.program}</h3>
+                                </div>
+                                <span class="text-xs font-medium text-gray-400">${item.date}</span>
                             </div>
-                            <h3 class="font-bold text-xl text-slate-800 leading-tight mb-2">${item.program}</h3>
-                            <p class="text-sm text-gray-600 leading-relaxed mb-4 line-clamp-4 bg-slate-50 p-2 rounded">
+
+                            <p class="text-sm text-gray-600 mb-6 leading-relaxed bg-slate-50 p-3 rounded-xl border border-slate-100">
                                 ${item.description || "No description provided."}
                             </p>
+
+                            <div class="grid grid-cols-3 gap-2 mb-6 gallery-grid">
+                                ${imageGrid}
+                            </div>
+
+                            <div class="mt-auto pt-4 border-t flex flex-wrap items-center gap-2 no-print">
+                                <span class="text-xs text-gray-400 italic mr-auto">By: ${item.name}</span>
+                                <div class="flex gap-1">
+                                    ${downloadLinks}
+                                </div>
+                                <button onclick="deleteReport('${item.id}')" class="text-red-400 hover:text-red-600 text-xs font-bold ml-2">Delete</button>
+                            </div>
                         </div>
-                        <div class="p-4 bg-gray-50 border-t flex justify-between items-center">
-                            <span class="text-xs text-gray-500 font-medium italic">By: ${item.name}</span>
-                            <button onclick="deleteReport('${item.id}')" class="text-red-500 text-xs font-bold hover:bg-red-50 px-2 py-1 rounded transition">
-                                Delete
-                            </button>
-                        </div>
-                    </div>
-                `).join('');
+                    `;
+                }).join('');
             };
 
             render(allDocs);
@@ -96,7 +135,7 @@
         });
 
         window.deleteReport = async (id) => {
-            if (confirm("Permanently delete this report?")) {
+            if (confirm("Permanently delete this report and images?")) {
                 await deleteDoc(doc(db, "reports", id));
             }
         };
