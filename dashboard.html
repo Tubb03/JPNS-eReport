@@ -9,18 +9,35 @@
 
 <body class="bg-gray-100 p-6">
     <div class="max-w-6xl mx-auto">
-        <div class="flex flex-col md:flex-row justify-between items-center mb-10 gap-4">
-            <h1 class="text-3xl font-black text-blue-900 italic">JPNS-eReport</h1>
-            <div class="flex gap-4">
-                <select id="filterUnit" class="p-2 border rounded-lg bg-white shadow-sm outline-none">
-                    <option value="All">All Units</option>
-                    <option value="Academic Unit">Academic Unit</option>
-                    <option value="Student Affairs Unit">Student Affairs Unit</option>
-                    <option value="Management Unit">Management Unit</option>
-                    <option value="ICT Unit">ICT Unit</option>
-                </select>
-                <a href="index.html" class="bg-blue-600 text-white px-4 py-2 rounded-lg font-bold">+ New</a>
+        <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
+            <div>
+                <h1 class="text-3xl font-black text-blue-900 italic">JPNS-eReport</h1>
+                <p class="text-gray-500">Activity Monitoring Dashboard</p>
             </div>
+
+            <div class="flex flex-wrap gap-3 items-center justify-center">
+                <div class="relative">
+                    <input type="text" id="searchInput" placeholder="Search reports..."
+                        class="p-2 pl-10 border rounded-lg bg-white shadow-sm outline-none focus:ring-2 focus:ring-blue-400 w-64">
+                    <span class="absolute left-3 top-2.5 opacity-30">🔍</span>
+                </div>
+
+                <select id="filterUnit"
+                    class="p-2 border rounded-lg bg-white shadow-sm outline-none focus:ring-2 focus:ring-blue-400">
+                    <option value="All">All Units</option>
+                    <option value="Unit A">Unit A</option>
+                    <option value="Unit B">Unit B</option>
+                    <option value="Unit C">Unit C</option>
+                    <option value="Unit D">Unit D</option>
+                </select>
+
+                <a href="index.html"
+                    class="bg-blue-600 text-white px-4 py-2 rounded-lg font-bold shadow-md hover:bg-blue-700">+ New</a>
+            </div>
+        </div>
+
+        <div class="mb-6">
+            <p id="statsCount" class="text-sm font-bold text-gray-400 uppercase tracking-widest"></p>
         </div>
 
         <div id="gallery" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
@@ -41,41 +58,80 @@
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
+
         const gallery = document.getElementById('gallery');
         const filter = document.getElementById('filterUnit');
+        const searchInput = document.getElementById('searchInput');
+        const statsCount = document.getElementById('statsCount');
+
+        let allReports = []; // Store reports globally for filtering
 
         const q = query(collection(db, "reports"), orderBy("createdAt", "desc"));
 
         onSnapshot(q, (snapshot) => {
-            const allDocs = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
-
-            const render = (dataList) => {
-                gallery.innerHTML = dataList.map(item => `
-                    <div class="bg-white rounded-xl shadow-md overflow-hidden border border-gray-200 flex flex-col">
-                        <img src="${item.imageUrls?.[0] || 'https://via.placeholder.com/300'}" class="w-full h-48 object-cover">
-                        <div class="p-4">
-                            <span class="text-[10px] font-bold text-blue-600 uppercase">${item.unit}</span>
-                            <h3 onclick="window.location.href='view-report.html?id=${item.id}'" class="font-bold text-lg text-slate-800 cursor-pointer hover:text-blue-600 transition truncate">${item.program}</h3>
-                            <p class="text-sm text-gray-500 mb-3">${item.date}</p>
-                            <p class="text-sm text-gray-600 line-clamp-2 italic">"${item.description || 'No summary'}"</p>
-                        </div>
-                        <div class="mt-auto p-4 bg-gray-50 border-t flex justify-between">
-                            <span class="text-[10px] text-gray-400">By: ${item.name}</span>
-                            <button onclick="deleteReport('${item.id}')" class="text-red-500 text-[10px] font-bold uppercase">Delete</button>
-                        </div>
-                    </div>
-                `).join('');
-            };
-
-            render(allDocs);
-            filter.onchange = () => {
-                const filtered = filter.value === "All" ? allDocs : allDocs.filter(d => d.unit === filter.value);
-                render(filtered);
-            };
+            allReports = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+            applyFilters(); // Initial render
         });
 
+        // Combined Filter and Search Logic
+        function applyFilters() {
+            const unitValue = filter.value;
+            const searchValue = searchInput.value.toLowerCase();
+
+            const filteredData = allReports.filter(item => {
+                const matchesUnit = unitValue === "All" || item.unit === unitValue;
+                const matchesSearch = item.program.toLowerCase().includes(searchValue) ||
+                    item.name.toLowerCase().includes(searchValue) ||
+                    (item.description && item.description.toLowerCase().includes(searchValue));
+
+                return matchesUnit && matchesSearch;
+            });
+
+            render(filteredData);
+            statsCount.innerText = `Showing ${filteredData.length} of ${allReports.length} Reports`;
+        }
+
+        function render(dataList) {
+            if (dataList.length === 0) {
+                gallery.innerHTML = '<div class="col-span-full text-center py-20 bg-white rounded-xl border-2 border-dashed text-gray-400">No reports found matches your criteria.</div>';
+                return;
+            }
+
+            gallery.innerHTML = dataList.map(item => `
+                <div class="bg-white rounded-xl shadow-md overflow-hidden border border-gray-200 flex flex-col hover:shadow-xl transition-shadow duration-300">
+                    <div class="relative">
+                        <img src="${item.imageUrls?.[0] || 'https://via.placeholder.com/300'}" class="w-full h-48 object-cover">
+                        <span class="absolute top-2 right-2 bg-white/90 backdrop-blur px-2 py-1 rounded text-[10px] font-bold text-gray-700 shadow-sm">
+                            ${item.imageUrls?.length || 0} Photos
+                        </span>
+                    </div>
+                    <div class="p-5 flex-grow">
+                        <span class="text-[10px] font-bold text-blue-600 uppercase tracking-tighter">${item.unit}</span>
+                        <h3 onclick="window.location.href='view-report.html?id=${item.id}'" 
+                            class="font-bold text-lg text-slate-800 cursor-pointer hover:text-blue-600 transition leading-tight mt-1">
+                            ${item.program}
+                        </h3>
+                        <p class="text-xs text-gray-400 mt-1 mb-3">${item.date}</p>
+                        <p class="text-sm text-gray-600 line-clamp-2 italic border-l-2 border-blue-100 pl-3">
+                            "${item.description || 'No summary available.'}"
+                        </p>
+                    </div>
+                    <div class="p-4 bg-gray-50 border-t flex justify-between items-center">
+                        <span class="text-[10px] text-gray-400 font-medium">By: ${item.name}</span>
+                        <button onclick="deleteReport('${item.id}')" class="text-red-400 hover:text-red-600 text-[10px] font-bold uppercase tracking-widest">Delete</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Event Listeners
+        filter.addEventListener('change', applyFilters);
+        searchInput.addEventListener('input', applyFilters);
+
         window.deleteReport = async (id) => {
-            if (confirm("Delete this report?")) await deleteDoc(doc(db, "reports", id));
+            if (confirm("Confirm deletion of this report?")) {
+                await deleteDoc(doc(db, "reports", id));
+            }
         };
     </script>
 </body>
