@@ -1,29 +1,48 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
-    <title>JPNS - Submit Report</title>
+    <meta charset="UTF-8">
+    <title>JPNS-eReport - Submit</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 
-<body class="bg-slate-100 p-4">
-    <div class="max-w-lg mx-auto bg-white p-8 rounded-xl shadow-md">
-        <h2 class="text-2xl font-bold mb-6 text-blue-800">New Activity Report</h2>
+<body class="bg-slate-100 p-4 md:p-8">
+    <div class="max-w-lg mx-auto bg-white p-8 rounded-xl shadow-lg">
+        <h2 class="text-2xl font-bold mb-6 text-blue-800 border-b pb-2">New Activity Report</h2>
+
         <form id="reportForm" class="space-y-4">
-            <input type="text" id="userName" placeholder="Your Name" required class="w-full p-2 border rounded">
-            <input type="text" id="programName" placeholder="Program Title" required class="w-full p-2 border rounded">
-            <select id="unit" class="w-full p-2 border rounded">
-                <option value="Unit A">Unit A</option>
-                <option value="Unit B">Unit B</option>
-                <option value="Unit C">Unit C</option>
+            <input type="text" id="userName" placeholder="Reporter Name" required
+                class="w-full p-2 border rounded focus:ring-2 focus:ring-blue-400 outline-none">
+            <input type="text" id="programName" placeholder="Program/Activity Title" required
+                class="w-full p-2 border rounded focus:ring-2 focus:ring-blue-400 outline-none">
+
+            <select id="unit" class="w-full p-2 border rounded bg-white">
+                <option value="Academic Unit">Academic Unit</option>
+                <option value="Student Affairs Unit">Student Affairs Unit</option>
+                <option value="Management Unit">Management Unit</option>
+                <option value="ICT Unit">ICT Unit</option>
             </select>
+
             <input type="date" id="programDate" required class="w-full p-2 border rounded">
-            <input type="file" id="imageUpload" accept="image/*" class="w-full text-sm">
-            <button type="submit" id="btn" class="w-full bg-blue-600 text-white py-3 rounded font-bold">Upload
+
+            <textarea id="description" rows="3" placeholder="Briefly describe the activity..."
+                class="w-full p-2 border rounded focus:ring-2 focus:ring-blue-400 outline-none"></textarea>
+
+            <div class="bg-gray-50 p-4 rounded-lg border border-dashed border-gray-300">
+                <label class="block text-sm font-medium text-gray-600 mb-2">Upload Program Photo</label>
+                <input type="file" id="imageUpload" accept="image/*" class="w-full text-sm text-gray-500">
+            </div>
+
+            <button type="submit" id="btn"
+                class="w-full bg-blue-600 text-white py-3 rounded-lg font-bold hover:bg-blue-700 transition">Upload
                 Report</button>
         </form>
-        <div class="mt-4 text-center"><a href="dashboard.html" class="text-blue-500 underline text-sm">View
-                Dashboard</a></div>
+
+        <div class="mt-6 text-center">
+            <a href="dashboard.html" class="text-blue-600 hover:underline text-sm font-medium">← View All Reports
+                (Dashboard)</a>
+        </div>
     </div>
 
     <script type="module">
@@ -37,8 +56,7 @@
             projectId: "jpns-ereport",
             storageBucket: "jpns-ereport.firebasestorage.app",
             messagingSenderId: "928703430086",
-            appId: "1:928703430086:web:273fc8a67f22ce1b9e86c7",
-            measurementId: "G-ZD4CJQQ5D2"
+            appId: "1:928703430086:web:273fc8a67f22ce1b9e86c7"
         };
 
         const app = initializeApp(firebaseConfig);
@@ -48,28 +66,35 @@
         document.getElementById('reportForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const btn = document.getElementById('btn');
-            btn.disabled = true; btn.innerText = "Processing...";
+            btn.disabled = true; btn.innerText = "Uploading... Please wait";
 
             const file = document.getElementById('imageUpload').files[0];
             let url = "";
 
-            if (file) {
-                const sRef = ref(storage, `images/${Date.now()}_${file.name}`);
-                await uploadBytes(sRef, file);
-                url = await getDownloadURL(sRef);
+            try {
+                if (file) {
+                    const sRef = ref(storage, `images/${Date.now()}_${file.name}`);
+                    await uploadBytes(sRef, file);
+                    url = await getDownloadURL(sRef);
+                }
+
+                await addDoc(collection(db, "reports"), {
+                    name: document.getElementById('userName').value,
+                    program: document.getElementById('programName').value,
+                    unit: document.getElementById('unit').value,
+                    date: document.getElementById('programDate').value,
+                    description: document.getElementById('description').value,
+                    imageUrl: url,
+                    createdAt: new Date()
+                });
+
+                alert("Report Successfully Submitted!");
+                location.reload();
+            } catch (err) {
+                console.error(err);
+                alert("Error submitting report. Check console.");
+                btn.disabled = false; btn.innerText = "Upload Report";
             }
-
-            await addDoc(collection(db, "reports"), {
-                name: document.getElementById('userName').value,
-                program: document.getElementById('programName').value,
-                unit: document.getElementById('unit').value,
-                date: document.getElementById('programDate').value,
-                imageUrl: url,
-                createdAt: new Date()
-            });
-
-            alert("Report Saved!");
-            location.reload();
         });
     </script>
 </body>
