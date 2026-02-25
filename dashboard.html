@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>JPNS-eReport Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-100 p-6">
+    <div class="max-w-6xl mx-auto">
+        <div class="flex flex-col md:flex-row justify-between items-center mb-10 gap-4">
+            <h1 class="text-3xl font-black text-blue-900">JPNS-eReport Dashboard</h1>
+            <div class="flex gap-4">
+                <select id="filterUnit" class="p-2 border rounded-lg bg-white shadow-sm">
+                    <option value="All">All Units</option>
+                    <option value="Unit A">Unit A</option>
+                    <option value="Unit B">Unit B</option>
+                    <option value="Unit C">Unit C</option>
+                </select>
+                <a href="index.html" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 font-bold">Add
+                    New +</a>
+            </div>
+        </div>
+
+        <div id="gallery" class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, collection, query, orderBy, onSnapshot, doc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCR9EPwlakRDXN1v6Rm19ro7XvowvBnY2k",
+            authDomain: "jpns-ereport.firebaseapp.com",
+            projectId: "jpns-ereport",
+            storageBucket: "jpns-ereport.firebasestorage.app",
+            messagingSenderId: "928703430086",
+            appId: "1:928703430086:web:273fc8a67f22ce1b9e86c7",
+            measurementId: "G-ZD4CJQQ5D2"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const gallery = document.getElementById('gallery');
+        const filter = document.getElementById('filterUnit');
+
+        // Real-time listener for reports
+        const q = query(collection(db, "reports"), orderBy("createdAt", "desc"));
+
+        onSnapshot(q, (snapshot) => {
+            const allDocs = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+
+            const render = (dataList) => {
+                gallery.innerHTML = dataList.map(item => `
+                    <div class="bg-white rounded-lg shadow-md overflow-hidden relative group">
+                        <img src="${item.imageUrl || 'https://via.placeholder.com/300'}" class="w-full h-48 object-cover">
+                        <div class="p-4">
+                            <span class="text-xs font-bold text-blue-600 uppercase">${item.unit}</span>
+                            <h3 class="font-bold text-lg text-slate-800">${item.program}</h3>
+                            <p class="text-sm text-gray-500">${item.date} | By: ${item.name}</p>
+                            
+                            <button onclick="deleteReport('${item.id}')" class="mt-4 text-red-500 text-xs font-semibold hover:underline">
+                                Delete Report
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+            };
+
+            render(allDocs);
+
+            filter.onchange = () => {
+                const filtered = filter.value === "All" ? allDocs : allDocs.filter(d => d.unit === filter.value);
+                render(filtered);
+            };
+        });
+
+        // Global function to delete a report
+        window.deleteReport = async (id) => {
+            if (confirm("Are you sure you want to delete this report?")) {
+                await deleteDoc(doc(db, "reports", id));
+            }
+        };
+    </script>
+</body>
+
+</html>
