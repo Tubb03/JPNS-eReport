@@ -43,14 +43,17 @@
             }
         }
 
-        /* Allow images to take more space */
+        /* Allow images to take more space natively */
         .dynamic-gallery {
-            max-height: 350px;
+            max-height: 380px;
+            /* Increased to allow multiple images to be larger */
         }
 
         .img-container {
-            aspect-ratio: 16 / 9;
+            aspect-ratio: auto;
+            min-height: 120px;
             height: 100%;
+            display: flex;
         }
 
         /* Hide scrollbar for clean UI */
@@ -108,19 +111,17 @@
             </section>
 
             <!-- Gallery Section -->
-            <section class="flex-shrink-0 min-h-0 flex flex-col">
-                <h2 class="text-[10px] font-black text-slate-400 tracking-widest uppercase mb-2 flex-shrink-0">
-                    Photographic Evidence
+            <section class="flex-shrink-0">
+                <h2 class="text-[10px] font-black text-slate-400 tracking-widest uppercase mb-2">Photographic Evidence
                 </h2>
-                <div id="vGallery"
-                    class="dynamic-gallery grid gap-1 w-full overflow-hidden rounded-md flex-shrink-1 min-h-[100px]">
+                <div id="vGallery" class="dynamic-gallery grid gap-1 w-full overflow-hidden rounded-md min-h-[150px]">
                 </div>
             </section>
 
             <!-- Detailed Report Section -->
-            <section class="flex-grow overflow-hidden flex flex-col min-h-0 relative">
+            <section class="flex-shrink flex flex-col min-h-[80px] relative mt-2">
                 <h2 class="text-[10px] font-black text-slate-400 tracking-widest uppercase mb-2">Detailed Report</h2>
-                <div class="flex-grow overflow-hidden pb-2 relative text-fit-container">
+                <div class="overflow-hidden pb-2 relative text-fit-container">
                     <div id="vFull"
                         class="text-[14px] text-slate-800 leading-relaxed text-justify whitespace-pre-wrap columns-1 md:columns-2 gap-8">
                     </div>
