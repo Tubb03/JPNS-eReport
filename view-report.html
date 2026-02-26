@@ -36,9 +36,9 @@
             }
         }
 
-        /* Prevent images from taking more than 25% of the page height */
+        /* Allow images to take more space */
         .dynamic-gallery {
-            max-height: 220px;
+            max-height: 350px;
         }
 
         .img-container {
@@ -104,7 +104,7 @@
             <section class="flex-shrink-0">
                 <h2 class="text-[10px] font-black text-slate-400 tracking-widest uppercase mb-2">Photographic Evidence
                 </h2>
-                <div id="vGallery" class="dynamic-gallery grid gap-3 w-full overflow-hidden rounded-md">
+                <div id="vGallery" class="dynamic-gallery grid gap-1 w-full overflow-hidden rounded-md">
                 </div>
             </section>
 
@@ -173,7 +173,7 @@
 
                 images.forEach(url => {
                     gallery.innerHTML += `
-                        <div class="img-container bg-slate-100 rounded-md border border-slate-200 overflow-hidden shadow-sm">
+                        <div class="img-container overflow-hidden shadow-sm">
                             <img src="${url}" class="w-full h-full object-cover">
                         </div>`;
                 });
