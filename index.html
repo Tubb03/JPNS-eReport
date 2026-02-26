@@ -76,16 +76,31 @@
             e.preventDefault();
             const btn = document.getElementById('btn');
             const files = document.getElementById('imageUpload').files;
-            btn.disabled = true; btn.innerText = "Processing Uploads...";
+
+            // Safety Check: Ensure images are selected
+            if (files.length === 0) {
+                alert("Please select at least one image before submitting.");
+                return;
+            }
+
+            btn.disabled = true;
+            btn.innerText = "Step 1: Uploading Images...";
 
             let urls = [];
+
             try {
                 for (let i = 0; i < files.length; i++) {
                     const sRef = ref(storage, `images/${Date.now()}_${files[i].name}`);
+                    console.log("Starting upload for:", files[i].name);
+
                     await uploadBytes(sRef, files[i]);
                     const downloadUrl = await getDownloadURL(sRef);
                     urls.push(downloadUrl);
+
+                    btn.innerText = `Uploaded ${i + 1} of ${files.length} images...`;
                 }
+
+                btn.innerText = "Step 2: Saving Report Data...";
 
                 await addDoc(collection(db, "reports"), {
                     name: document.getElementById('userName').value,
@@ -99,12 +114,14 @@
                     createdAt: new Date()
                 });
 
-                alert("Report and " + urls.length + " images submitted!");
+                alert("Successfully Saved!");
                 location.href = "dashboard.html";
+
             } catch (err) {
-                console.error(err);
-                alert("Upload failed.");
+                console.error("FULL ERROR DETAIL:", err);
+                alert("CRITICAL ERROR: " + err.message);
                 btn.disabled = false;
+                btn.innerText = "Retry Upload";
             }
         });
     </script>
