@@ -108,10 +108,12 @@
             </section>
 
             <!-- Gallery Section -->
-            <section class="flex-shrink-0">
-                <h2 class="text-[10px] font-black text-slate-400 tracking-widest uppercase mb-2">Photographic Evidence
+            <section class="flex-shrink-0 min-h-0 flex flex-col">
+                <h2 class="text-[10px] font-black text-slate-400 tracking-widest uppercase mb-2 flex-shrink-0">
+                    Photographic Evidence
                 </h2>
-                <div id="vGallery" class="dynamic-gallery grid gap-1 w-full overflow-hidden rounded-md">
+                <div id="vGallery"
+                    class="dynamic-gallery grid gap-1 w-full overflow-hidden rounded-md flex-shrink-1 min-h-[100px]">
                 </div>
             </section>
 
@@ -192,13 +194,15 @@
                     const content = document.getElementById('vFull');
                     let currentSize = 14; // Start at 14px text
 
-                    // Reduce font size until the total report box fits within standard A4 height (1122px approx screen approx 296mm) or until 9px
-                    while (reportBox.scrollHeight > reportBox.clientHeight && currentSize > 9) {
+                    // Reduce font size until the total content fits within standard A4 height
+                    const footer = reportBox.querySelector('.mt-auto');
+
+                    while (footer.getBoundingClientRect().bottom > reportBox.getBoundingClientRect().bottom && currentSize > 9) {
                         currentSize -= 0.5;
                         content.style.fontSize = currentSize + 'px';
                         content.style.lineHeight = '1.4';
                     }
-                }, 150);
+                }, 800); // Increased timeout to wait for images to paint
             }
         }
     </script>
