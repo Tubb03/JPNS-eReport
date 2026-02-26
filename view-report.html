@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Full Report View</title>
+    <title>Report Detail</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @media print {
@@ -11,7 +11,11 @@
                 display: none !important;
             }
 
-            .report-box {
+            body {
+                padding: 0;
+            }
+
+            .print-box {
                 border: none !important;
                 box-shadow: none !important;
             }
@@ -19,46 +23,50 @@
     </style>
 </head>
 
-<body class="bg-gray-50 p-4 md:p-10">
-    <div class="max-w-4xl mx-auto bg-white p-8 md:p-12 border shadow-sm rounded-lg report-box">
-        <div class="border-b-4 border-blue-900 pb-4 mb-8 flex justify-between items-end">
+<body class="bg-slate-50 p-4 md:p-10">
+    <div class="max-w-4xl mx-auto bg-white p-8 md:p-16 border rounded-2xl shadow-xl print-box">
+        <div class="flex justify-between items-end border-b-8 border-blue-900 pb-6 mb-10">
             <div>
-                <h1 id="vProgram" class="text-4xl font-black text-slate-900 uppercase">...</h1>
-                <p id="vUnit" class="text-blue-600 font-bold tracking-widest uppercase mt-1"></p>
+                <h1 id="vProgram" class="text-4xl font-black text-slate-900 leading-none">...</h1>
+                <p id="vUnit" class="text-blue-600 font-black uppercase tracking-widest mt-3"></p>
             </div>
             <div class="text-right">
-                <p id="vDate" class="text-gray-600 font-bold"></p>
-                <p id="vName" class="text-xs text-gray-400"></p>
+                <p id="vDate" class="text-lg font-bold text-slate-800"></p>
+                <p id="vName" class="text-xs text-slate-400 uppercase italic"></p>
             </div>
         </div>
 
-        <div class="space-y-10">
+        <div class="space-y-12">
             <section>
-                <h2 class="text-sm font-black text-slate-400 tracking-tighter mb-2 uppercase italic">Program Objective
-                </h2>
-                <p id="vObjective" class="text-lg text-slate-700 leading-relaxed"></p>
+                <h2
+                    class="text-xs font-black text-blue-900 uppercase tracking-tighter mb-3 border-l-4 border-blue-900 pl-3">
+                    Program Objective</h2>
+                <p id="vObjective" class="text-xl text-slate-700 leading-relaxed font-serif italic"></p>
             </section>
 
             <section>
-                <h2 class="text-sm font-black text-slate-400 tracking-tighter mb-2 uppercase italic">Detailed Report
-                </h2>
+                <h2
+                    class="text-xs font-black text-blue-900 uppercase tracking-tighter mb-3 border-l-4 border-blue-900 pl-3">
+                    Documentation Details</h2>
                 <div id="vFull"
-                    class="text-slate-700 leading-relaxed whitespace-pre-wrap border-l-4 border-gray-100 pl-6"></div>
+                    class="text-slate-700 leading-relaxed whitespace-pre-wrap text-lg bg-slate-50 p-6 rounded-2xl">
+                </div>
             </section>
 
             <section>
-                <h2 class="text-sm font-black text-slate-400 tracking-tighter mb-4 uppercase italic">Photographic
-                    Evidence</h2>
-                <div id="vGallery" class="grid grid-cols-1 md:grid-cols-2 gap-6"></div>
+                <h2
+                    class="text-xs font-black text-blue-900 uppercase tracking-tighter mb-6 border-l-4 border-blue-900 pl-3">
+                    Visual Evidence</h2>
+                <div id="vGallery" class="grid grid-cols-1 md:grid-cols-2 gap-8"></div>
             </section>
         </div>
 
-        <div class="mt-12 pt-8 border-t no-print flex gap-4">
+        <div class="mt-16 pt-10 border-t no-print flex gap-6">
             <button onclick="window.print()"
-                class="bg-blue-600 text-white px-8 py-3 rounded-xl font-bold shadow-lg hover:bg-blue-700 transition">Download
-                PDF Report</button>
+                class="bg-blue-900 text-white px-10 py-4 rounded-2xl font-black shadow-xl hover:scale-105 transition">DOWNLOAD
+                AS PDF</button>
             <button onclick="window.location.href='dashboard.html'"
-                class="bg-gray-200 text-gray-700 px-8 py-3 rounded-xl font-bold">Back</button>
+                class="bg-gray-100 text-gray-500 px-10 py-4 rounded-2xl font-bold">EXIT</button>
         </div>
     </div>
 
@@ -78,27 +86,22 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        const urlParams = new URLSearchParams(window.location.search);
-        const reportId = urlParams.get('id');
-
-        if (reportId) {
-            const docSnap = await getDoc(doc(db, "reports", reportId));
-            if (docSnap.exists()) {
-                const data = docSnap.data();
-                document.getElementById('vProgram').innerText = data.program;
-                document.getElementById('vUnit').innerText = data.unit;
-                document.getElementById('vDate').innerText = data.date;
-                document.getElementById('vName').innerText = "Compiled by: " + data.name;
-                document.getElementById('vObjective').innerText = data.objective || "No objective stated.";
-                document.getElementById('vFull').innerText = data.fullReport || "No detailed report available.";
+        const id = new URLSearchParams(window.location.search).get('id');
+        if (id) {
+            const snap = await getDoc(doc(db, "reports", id));
+            if (snap.exists()) {
+                const d = snap.data();
+                document.getElementById('vProgram').innerText = d.program;
+                document.getElementById('vUnit').innerText = d.unit;
+                document.getElementById('vDate').innerText = d.date;
+                document.getElementById('vName').innerText = "Submitted By: " + d.name;
+                document.getElementById('vObjective').innerText = d.objective || "N/A";
+                document.getElementById('vFull').innerText = d.fullReport || "No details provided.";
 
                 const gallery = document.getElementById('vGallery');
-                (data.imageUrls || []).forEach(url => {
-                    gallery.innerHTML += `<div class="bg-gray-100 rounded-lg overflow-hidden border shadow-sm hover:shadow-md transition"><img src="${url}" class="w-full h-auto"></div>`;
+                (d.imageUrls || []).forEach(url => {
+                    gallery.innerHTML += `<img src="${url}" class="w-full rounded-3xl shadow-lg border-8 border-white">`;
                 });
-            } else {
-                alert("Report not found!");
-                window.location.href = "dashboard.html";
             }
         }
     </script>

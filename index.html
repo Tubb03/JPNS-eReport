@@ -3,67 +3,72 @@
 
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>JPNS-eReport - Submit</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 
 <body class="bg-slate-100 p-4 md:p-8">
-    <div class="max-w-xl mx-auto bg-white p-8 rounded-xl shadow-lg">
-        <h2 class="text-2xl font-bold mb-6 text-blue-800 border-b pb-2">New Activity Report</h2>
+    <div class="max-w-2xl mx-auto bg-white p-8 rounded-xl shadow-lg border border-gray-200">
+        <h2 class="text-2xl font-black mb-6 text-blue-900 border-b-2 border-blue-100 pb-2 italic">JPNS-eReport
+            Submission</h2>
 
         <form id="reportForm" class="space-y-4">
-            <div class="grid grid-cols-2 gap-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <input type="text" id="userName" placeholder="Reporter Name" required
-                    class="p-2 border rounded outline-none focus:ring-2 focus:ring-blue-400">
+                    class="p-2 border rounded shadow-sm outline-none focus:ring-2 focus:ring-blue-400">
                 <input type="date" id="programDate" required
-                    class="p-2 border rounded outline-none focus:ring-2 focus:ring-blue-400">
+                    class="p-2 border rounded shadow-sm outline-none focus:ring-2 focus:ring-blue-400">
             </div>
 
             <input type="text" id="programName" placeholder="Program/Activity Title" required
-                class="w-full p-2 border rounded outline-none focus:ring-2 focus:ring-blue-400">
+                class="w-full p-2 border rounded shadow-sm outline-none focus:ring-2 focus:ring-blue-400">
 
-            <select id="unit" class="w-full p-2 border rounded bg-white outline-none focus:ring-2 focus:ring-blue-400">
-                <option value="Unit A">Unit A</option>
-                <option value="Unit B">Unit B</option>
-                <option value="Unit C">Unit C</option>
-                <option value="Unit D">Unit D</option>
+            <select id="unit"
+                class="w-full p-2 border rounded bg-white shadow-sm outline-none focus:ring-2 focus:ring-blue-400">
+                <option value="Academic Unit">Academic Unit</option>
+                <option value="Student Affairs Unit">Student Affairs Unit</option>
+                <option value="Management Unit">Management Unit</option>
+                <option value="ICT Unit">ICT Unit</option>
             </select>
 
             <textarea id="description" rows="2" placeholder="Short Summary (for Dashboard)"
-                class="w-full p-2 border rounded outline-none focus:ring-2 focus:ring-blue-400"></textarea>
-
-            <textarea id="objective" rows="2" placeholder="Program Objective(s)"
-                class="w-full p-2 border rounded outline-none focus:ring-2 focus:ring-blue-400"></textarea>
-
+                class="w-full p-2 border rounded outline-none focus:ring-2 focus:ring-blue-400 shadow-sm"></textarea>
+            <textarea id="objective" rows="2" placeholder="Program Objective"
+                class="w-full p-2 border rounded outline-none focus:ring-2 focus:ring-blue-400 shadow-sm"></textarea>
             <textarea id="fullReport" rows="5" placeholder="Detailed Report Content"
-                class="w-full p-2 border rounded outline-none focus:ring-2 focus:ring-blue-400"></textarea>
+                class="w-full p-2 border rounded outline-none focus:ring-2 focus:ring-blue-400 shadow-sm"></textarea>
 
-            <div class="bg-blue-50 p-4 rounded-lg border-2 border-dashed border-blue-200">
-                <label class="block text-sm font-bold text-blue-700 mb-2">Upload Program Photos (Multiple)</label>
+            <div class="bg-blue-50 p-6 rounded-xl border-2 border-dashed border-blue-200">
+                <label class="block text-sm font-bold text-blue-800 mb-2">Upload Program Photos (Multiple)</label>
                 <input type="file" id="imageUpload" accept="image/*" multiple
                     class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-700 cursor-pointer">
+
+                <div id="previewGallery" class="grid grid-cols-3 sm:grid-cols-4 gap-2 mt-4"></div>
+            </div>
+
+            <div id="progressContainer"
+                class="hidden w-full bg-gray-200 rounded-full h-5 mb-4 shadow-inner overflow-hidden">
+                <div id="progressBar"
+                    class="bg-blue-600 h-full text-[10px] text-white text-center leading-5 font-bold transition-all duration-300"
+                    style="width: 0%">0%</div>
             </div>
 
             <button type="submit" id="btn"
-                class="w-full bg-blue-600 text-white py-3 rounded-lg font-bold hover:bg-blue-700 transition shadow-lg">Submit
+                class="w-full bg-blue-600 text-white py-4 rounded-xl font-black text-lg hover:bg-blue-700 transition shadow-lg uppercase tracking-widest">Submit
                 Full Report</button>
         </form>
 
         <div class="mt-6 text-center">
-            <a href="dashboard.html" class="text-blue-600 hover:underline text-sm font-medium">← View Dashboard</a>
-        </div>
-
-        <div id="progressContainer" class="hidden w-full bg-gray-200 rounded-full h-4 mb-4">
-            <div id="progressBar"
-                class="bg-blue-600 h-4 rounded-full text-[10px] text-white text-center leading-4 font-bold transition-all duration-300"
-                style="width: 0%">0%</div>
+            <a href="dashboard.html" class="text-blue-600 hover:underline text-sm font-bold tracking-tight">← Back to
+                Dashboard</a>
         </div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-        import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
+        import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyCR9EPwlakRDXN1v6Rm19ro7XvowvBnY2k",
@@ -78,35 +83,66 @@
         const db = getFirestore(app);
         const storage = getStorage(app);
 
+        // --- IMAGE PREVIEW LOGIC ---
+        const imageUpload = document.getElementById('imageUpload');
+        const previewGallery = document.getElementById('previewGallery');
+
+        imageUpload.addEventListener('change', () => {
+            previewGallery.innerHTML = ""; // Clear old previews
+            const files = Array.from(imageUpload.files);
+
+            files.forEach(file => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const img = document.createElement('img');
+                    img.src = e.target.result;
+                    img.className = "w-full h-20 object-cover rounded shadow-sm border border-white";
+                    previewGallery.appendChild(img);
+                };
+                reader.readAsDataURL(file);
+            });
+        });
+
+        // --- SUBMISSION LOGIC ---
         document.getElementById('reportForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const btn = document.getElementById('btn');
-            const files = document.getElementById('imageUpload').files;
+            const files = imageUpload.files;
+            const progContainer = document.getElementById('progressContainer');
+            const progBar = document.getElementById('progressBar');
 
-            // Safety Check: Ensure images are selected
-            if (files.length === 0) {
-                alert("Please select at least one image before submitting.");
-                return;
-            }
+            if (files.length === 0) return alert("Please select at least one photo!");
 
             btn.disabled = true;
-            btn.innerText = "Step 1: Uploading Images...";
+            btn.innerText = "UPLOADING...";
+            progContainer.classList.remove('hidden');
 
             let urls = [];
 
             try {
                 for (let i = 0; i < files.length; i++) {
-                    const sRef = ref(storage, `images/${Date.now()}_${files[i].name}`);
-                    console.log("Starting upload for:", files[i].name);
+                    const file = files[i];
+                    const sRef = ref(storage, `images/${Date.now()}_${file.name}`);
+                    const uploadTask = uploadBytesResumable(sRef, file);
 
-                    await uploadBytes(sRef, files[i]);
-                    const downloadUrl = await getDownloadURL(sRef);
-                    urls.push(downloadUrl);
-
-                    btn.innerText = `Uploaded ${i + 1} of ${files.length} images...`;
+                    await new Promise((resolve, reject) => {
+                        uploadTask.on('state_changed',
+                            (snap) => {
+                                const progress = (snap.bytesTransferred / snap.totalBytes) * 100;
+                                progBar.style.width = progress + "%";
+                                progBar.innerText = `PHOTO ${i + 1}/${files.length}: ${Math.round(progress)}%`;
+                            },
+                            (err) => reject(err),
+                            async () => {
+                                const dUrl = await getDownloadURL(uploadTask.snapshot.ref);
+                                urls.push(dUrl);
+                                resolve();
+                            }
+                        );
+                    });
                 }
 
-                btn.innerText = "Step 2: Saving Report Data...";
+                btn.innerText = "SAVING REPORT...";
 
                 await addDoc(collection(db, "reports"), {
                     name: document.getElementById('userName').value,
@@ -120,14 +156,14 @@
                     createdAt: new Date()
                 });
 
-                alert("Successfully Saved!");
+                alert("Successfully Submitted!");
                 location.href = "dashboard.html";
 
             } catch (err) {
-                console.error("FULL ERROR DETAIL:", err);
-                alert("CRITICAL ERROR: " + err.message);
+                console.error(err);
+                alert("Upload failed! Please check your internet and Firebase Storage rules.");
                 btn.disabled = false;
-                btn.innerText = "Retry Upload";
+                btn.innerText = "Retry Submission";
             }
         });
     </script>
