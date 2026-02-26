@@ -128,9 +128,28 @@
         filter.addEventListener('change', applyFilters);
         searchInput.addEventListener('input', applyFilters);
 
+        // --- ADMIN SECURITY CONFIG ---
+        const ADMIN_PIN = "1234";
+
         window.deleteReport = async (id) => {
-            if (confirm("Confirm deletion of this report?")) {
-                await deleteDoc(doc(db, "reports", id));
+            // 1. Ask for the PIN
+            const userPin = prompt("Enter Admin PIN to delete this report:");
+
+            // 2. Check if PIN is correct
+            if (userPin === ADMIN_PIN) {
+                if (confirm("PIN Correct. Are you sure you want to PERMANENTLY delete this report and all its images?")) {
+                    try {
+                        await deleteDoc(doc(db, "reports", id));
+                        alert("Report deleted successfully.");
+                    } catch (error) {
+                        console.error("Error deleting:", error);
+                        alert("Failed to delete. Check your Firebase permissions.");
+                    }
+                }
+            } else if (userPin === null) {
+                // User clicked cancel, do nothing
+            } else {
+                alert("Incorrect PIN. Access Denied.");
             }
         };
     </script>
