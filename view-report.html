@@ -7,17 +7,19 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @page {
-            size: A4;
+            size: A4 portrait;
             margin: 0;
         }
 
+        /* Essential print fixes for exact A4 rendering */
         @media print {
             body {
-                background: white;
-                padding: 0;
-                margin: 0;
-                height: 100vh;
-                overflow: hidden;
+                background: white !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+                display: block !important;
             }
 
             .no-print {
@@ -27,12 +29,17 @@
             .report-box {
                 border: none !important;
                 box-shadow: none !important;
-                width: 100vw !important;
-                max-width: 100vw !important;
-                height: 100vh !important;
-                max-height: 100vh !important;
+                width: 210mm !important;
+                max-width: 210mm !important;
+                height: 296mm !important;
+                /* Slightly under 297mm to prevent blank second page bleed */
+                max-height: 296mm !important;
                 padding: 15mm !important;
-                margin: 0 !important;
+                margin: 0 auto !important;
+                position: relative !important;
+                page-break-after: avoid !important;
+                page-break-before: avoid !important;
+                overflow: hidden !important;
             }
         }
 
@@ -109,9 +116,9 @@
             </section>
 
             <!-- Detailed Report Section -->
-            <section class="flex-grow overflow-hidden flex flex-col min-h-0">
+            <section class="flex-grow overflow-hidden flex flex-col min-h-0 relative">
                 <h2 class="text-[10px] font-black text-slate-400 tracking-widest uppercase mb-2">Detailed Report</h2>
-                <div class="flex-grow overflow-y-auto no-scrollbar pb-2 relative text-fit-container">
+                <div class="flex-grow overflow-hidden pb-2 relative text-fit-container">
                     <div id="vFull"
                         class="text-[14px] text-slate-800 leading-relaxed text-justify whitespace-pre-wrap columns-1 md:columns-2 gap-8">
                     </div>
@@ -180,17 +187,18 @@
 
                 // Auto-fit text logic to ensure it stays on one page without cutting off manually
                 setTimeout(() => {
+                    const reportBox = document.querySelector('.report-box');
                     const contentContainer = document.getElementById('vFull').parentElement;
                     const content = document.getElementById('vFull');
                     let currentSize = 14; // Start at 14px text
 
-                    // Reduce font size until it fits, bounding minimum to 9px
-                    while (content.scrollHeight > contentContainer.clientHeight && currentSize > 9) {
+                    // Reduce font size until the total report box fits within standard A4 height (1122px approx screen approx 296mm) or until 9px
+                    while (reportBox.scrollHeight > reportBox.clientHeight && currentSize > 9) {
                         currentSize -= 0.5;
                         content.style.fontSize = currentSize + 'px';
                         content.style.lineHeight = '1.4';
                     }
-                }, 100);
+                }, 150);
             }
         }
     </script>
