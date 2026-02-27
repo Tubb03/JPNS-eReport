@@ -40,10 +40,22 @@
 
             <textarea id="description" rows="2" placeholder="Short Summary (for Dashboard)"
                 class="w-full p-2 border rounded outline-none focus:ring-2 focus:ring-blue-400 shadow-sm"></textarea>
-            <textarea id="objective" rows="2" placeholder="Program Objective"
-                class="w-full p-2 border rounded outline-none focus:ring-2 focus:ring-blue-400 shadow-sm"></textarea>
-            <textarea id="fullReport" rows="5" placeholder="Detailed Report Content"
-                class="w-full p-2 border rounded outline-none focus:ring-2 focus:ring-blue-400 shadow-sm"></textarea>
+            <div>
+                <textarea id="objective" rows="2" placeholder="Program Objective"
+                    class="w-full p-2 border rounded outline-none focus:ring-2 focus:ring-blue-400 shadow-sm"></textarea>
+                <div class="text-right text-[11px] text-gray-500 mt-1 font-semibold tracking-wide">
+                    Word count: <span id="objectiveWordCount" class="text-blue-600">0</span> <span
+                        class="text-gray-400">/ ~50 (Recommended for 1-page fit)</span>
+                </div>
+            </div>
+            <div>
+                <textarea id="fullReport" rows="5" placeholder="Detailed Report Content"
+                    class="w-full p-2 border rounded outline-none focus:ring-2 focus:ring-blue-400 shadow-sm"></textarea>
+                <div class="text-right text-[11px] text-gray-500 mt-1 font-semibold tracking-wide">
+                    Word count: <span id="fullReportWordCount" class="text-blue-600">0</span> <span
+                        class="text-gray-400">/ ~250 (Recommended for 1-page fit)</span>
+                </div>
+            </div>
 
             <div class="bg-blue-50 p-6 rounded-xl border-2 border-dashed border-blue-200">
                 <label class="block text-sm font-bold text-blue-800 mb-2">Upload Program Photos (Multiple)</label>
@@ -90,6 +102,25 @@
         const imageUpload = document.getElementById('imageUpload');
         const previewGallery = document.getElementById('previewGallery');
         let selectedFiles = [];
+
+        // Word count functionality
+        const countWords = (str) => str.trim().split(/\s+/).filter(w => w.length > 0).length;
+
+        const objInput = document.getElementById('objective');
+        const objCount = document.getElementById('objectiveWordCount');
+        objInput.addEventListener('input', () => {
+            const count = countWords(objInput.value);
+            objCount.innerText = count;
+            objCount.className = count > 50 ? 'text-red-600 font-bold' : 'text-blue-600';
+        });
+
+        const repInput = document.getElementById('fullReport');
+        const repCount = document.getElementById('fullReportWordCount');
+        repInput.addEventListener('input', () => {
+            const count = countWords(repInput.value);
+            repCount.innerText = count;
+            repCount.className = count > 250 ? 'text-red-600 font-bold' : 'text-blue-600';
+        });
 
         imageUpload.addEventListener('change', (e) => {
             const files = Array.from(e.target.files);
