@@ -164,23 +164,60 @@
                 return;
             }
 
-            gallery.innerHTML = filtered.map(item => `
-                <div class="bg-white rounded-2xl shadow-sm border border-gray-200 flex flex-col hover:shadow-2xl transition-all duration-500 overflow-hidden">
-                    <img src="${item.imageUrls?.[0] || 'https://via.placeholder.com/400x250'}" class="w-full h-48 object-cover">
-                    <div class="p-5 flex-grow">
-                        <span class="text-[10px] font-black text-purple-600 bg-purple-50 px-2 py-1 rounded-md uppercase">${item.unit}</span>
-                        <h3 onclick="window.location.href='view-report.html?id=${item.id}'" class="font-bold text-xl text-slate-800 cursor-pointer hover:text-purple-600 transition leading-tight mt-2 line-clamp-2 italic underline decoration-purple-100">
-                            ${item.program}
-                        </h3>
-                        <p class="text-xs text-gray-400 mt-2 font-semibold">Submitted by: <span class="text-gray-600">${item.name}</span></p>
-                        <p class="text-xs text-gray-400 mt-1">Date: ${item.date}</p>
-                    </div>
-                    <div class="p-4 bg-gray-50 border-t flex justify-between items-center">
-                        <span class="text-[10px] text-gray-400 font-bold">REPORTED ON: ${item.createdAt?.toDate?.() ? item.createdAt.toDate().toLocaleDateString() : new Date().toLocaleDateString()}</span>
-                        <button onclick="deleteReport('${item.id}')" class="text-red-400 hover:text-red-600 text-[10px] font-black uppercase">Delete</button>
-                    </div>
+            // Group by Month and Year
+            const grouped = {};
+            filtered.forEach(item => {
+                const d = new Date(item.date);
+                // Extract "Month YYYY", e.g. "January 2024" if available, else fallback
+                const monthYear = !isNaN(d.getTime()) ? d.toLocaleString('en-US', { month: 'long', year: 'numeric' }) : 'Unknown Date';
+
+                // Key for robust sorting: YYYYMM (e.g. 202401)
+                const sortKey = !isNaN(d.getTime()) ? d.getFullYear() * 100 + d.getMonth() : 0;
+
+                if (!grouped[sortKey]) {
+                    grouped[sortKey] = { label: monthYear, items: [] };
+                }
+                grouped[sortKey].items.push(item);
+            });
+
+            // Sort keys descending so newest months are first
+            const sortedKeys = Object.keys(grouped).sort((a, b) => b - a);
+
+            let html = "";
+            sortedKeys.forEach(key => {
+                const group = grouped[key];
+
+                // Add header for the month/year grouping
+                html += `
+                <div class="col-span-1 md:col-span-2 lg:col-span-3 mt-8 mb-2 border-b-2 border-purple-200 pb-2">
+                    <h3 class="text-xl font-black text-slate-800 flex items-center gap-3">
+                        <span class="text-2xl opacity-40">📅</span> ${group.label}
+                        <span class="text-xs text-purple-600 bg-purple-100 px-2 py-0.5 rounded-full font-bold ml-2 shadow-sm">${group.items.length} Reports</span>
+                    </h3>
                 </div>
-            `).join('');
+                `;
+
+                // Add all items in the group
+                html += group.items.map(item => `
+                    <div class="bg-white rounded-2xl shadow-sm border border-gray-200 flex flex-col hover:shadow-2xl transition-all duration-500 overflow-hidden">
+                        <img src="${item.imageUrls?.[0] || 'https://via.placeholder.com/400x250'}" class="w-full h-48 object-cover">
+                        <div class="p-5 flex-grow">
+                            <span class="text-[10px] font-black text-purple-600 bg-purple-50 px-2 py-1 rounded-md uppercase">${item.unit}</span>
+                            <h3 onclick="window.location.href='view-report.html?id=${item.id}'" class="font-bold text-xl text-slate-800 cursor-pointer hover:text-purple-600 transition leading-tight mt-2 line-clamp-2 italic underline decoration-purple-100">
+                                ${item.program}
+                            </h3>
+                            <p class="text-xs text-gray-400 mt-2 font-semibold">Submitted by: <span class="text-gray-600">${item.name}</span></p>
+                            <p class="text-xs text-gray-400 mt-1">Date: ${item.date}</p>
+                        </div>
+                        <div class="p-4 bg-gray-50 border-t flex justify-between items-center">
+                            <span class="text-[10px] text-gray-400 font-bold">REPORTED ON: ${item.createdAt?.toDate?.() ? item.createdAt.toDate().toLocaleDateString() : new Date().toLocaleDateString()}</span>
+                            <button onclick="deleteReport('${item.id}')" class="text-red-400 hover:text-red-600 text-[10px] font-black uppercase">Delete</button>
+                        </div>
+                    </div>
+                `).join('');
+            });
+
+            gallery.innerHTML = html;
         }
 
         filterStaff.addEventListener('change', refreshUI);
