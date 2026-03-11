@@ -30,10 +30,11 @@
             <div class="flex flex-wrap gap-3 items-center">
                 <div class="relative">
                     <input type="text" id="searchInput" placeholder="Search title or staff..."
+                        aria-label="Search Reports"
                         class="p-2 pl-9 border rounded-lg bg-white shadow-sm outline-none focus:ring-2 focus:ring-blue-400 w-64 text-sm">
-                    <span class="absolute left-3 top-2.5 opacity-30">🔍</span>
+                    <span class="absolute left-3 top-2.5 opacity-30" aria-hidden="true">🔍</span>
                 </div>
-                <select id="filterUnit"
+                <select id="filterUnit" aria-label="Filter by Unit"
                     class="p-2 border rounded-lg bg-white shadow-sm outline-none focus:ring-2 focus:ring-blue-400 text-sm font-semibold">
                     <option value="All">All Units</option>
                     <option value="Unit Dasar dan Latihan">Unit Dasar dan Latihan</option>
@@ -44,6 +45,19 @@
                     <option value="Unit Pelantar Pembelajaran">Unit Pelantar Pembelajaran
                     </option>
                 </select>
+                <div class="flex items-center gap-2 border bg-white rounded-lg shadow-sm px-3 py-1.5 focus-within:ring-2 focus-within:ring-emerald-400 transition"
+                    role="group" aria-label="Date Range Filter">
+                    <span class="text-[10px] font-black text-emerald-600 tracking-wider">FROM</span>
+                    <input type="date" id="startDate" aria-label="Start Date"
+                        class="outline-none text-sm font-semibold text-slate-700 bg-transparent cursor-pointer">
+                    <span class="text-[10px] font-black text-emerald-600 tracking-wider">TO</span>
+                    <input type="date" id="endDate" aria-label="End Date"
+                        class="outline-none text-sm font-semibold text-slate-700 bg-transparent cursor-pointer">
+                </div>
+                <button id="exportCsvBtn"
+                    class="bg-emerald-600 text-white px-5 py-2 rounded-lg font-black shadow-md hover:bg-emerald-700 transition">
+                    EXPORT CSV
+                </button>
                 <a href="staff-reports.html"
                     class="bg-purple-600 text-white px-5 py-2 rounded-lg font-black shadow-md hover:bg-purple-700 transition">STAFF
                     REPORTS</a>

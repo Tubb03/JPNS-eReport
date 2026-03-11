@@ -83,7 +83,20 @@ document.getElementById('reportForm').addEventListener('submit', async (e) => {
     let urls = [];
     try {
         for (let i = 0; i < selectedFiles.length; i++) {
-            const file = selectedFiles[i];
+            let file = selectedFiles[i];
+
+            // Compress Image
+            progBar.style.width = "100%";
+            progBar.innerText = `COMPRESSING PHOTO ${i + 1}/${selectedFiles.length}...`;
+
+            try {
+                // Compress to max 1MB or 1920px
+                const options = { maxSizeMB: 1, maxWidthOrHeight: 1920, useWebWorker: true };
+                file = await window.imageCompression(file, options);
+            } catch (error) {
+                console.error("Image compression failed, using original file.", error);
+            }
+
             const sRef = ref(storage, `images/${Date.now()}_${file.name}`);
             const uploadTask = uploadBytesResumable(sRef, file);
 
@@ -92,7 +105,7 @@ document.getElementById('reportForm').addEventListener('submit', async (e) => {
                     (snap) => {
                         const progress = (snap.bytesTransferred / snap.totalBytes) * 100;
                         progBar.style.width = progress + "%";
-                        progBar.innerText = `PHOTO ${i + 1}/${selectedFiles.length}: ${Math.round(progress)}%`;
+                        progBar.innerText = `UPLOADING PHOTO ${i + 1}/${selectedFiles.length}: ${Math.round(progress)}%`;
                     },
                     (err) => reject(err),
                     async () => {

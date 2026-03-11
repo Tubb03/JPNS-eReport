@@ -28,6 +28,7 @@ const staffReportCount = document.getElementById('staffReportCount');
 
 const ADMIN_PIN = "1234";
 let allReports = [];
+let currentLimit = 12;
 
 const staffByUnit = {
     "Unit Dasar dan Latihan": ["Julai Bin David Jipin @ Gipin", "Desmond Ak Sandum"],
@@ -67,10 +68,12 @@ filterUnit.dispatchEvent(new Event('change'));
 
 onSnapshot(query(collection(db, "reports"), orderBy("createdAt", "desc")), (snap) => {
     allReports = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-    refreshUI();
+    refreshUI(true);
 });
 
-function refreshUI() {
+function refreshUI(resetLimit = false) {
+    if (resetLimit) currentLimit = 12;
+
     const unit = filterUnit.value;
     const staff = filterStaff.value;
 
@@ -113,9 +116,11 @@ function refreshUI() {
         return;
     }
 
+    const paginated = filtered.slice(0, currentLimit);
+
     // Group by Month and Year
     const grouped = {};
-    filtered.forEach(item => {
+    paginated.forEach(item => {
         const d = new Date(item.date);
         // Extract "Month YYYY", e.g. "January 2024" if available, else fallback
         const monthYear = !isNaN(d.getTime()) ? d.toLocaleString('en-US', { month: 'long', year: 'numeric' }) : 'Unknown Date';
@@ -166,10 +171,28 @@ function refreshUI() {
         `).join('');
     });
 
+    if (currentLimit < filtered.length) {
+        html += `
+        <div class="col-span-1 md:col-span-2 lg:col-span-3 flex justify-center mt-6 mb-4">
+            <button id="loadMoreBtn" class="bg-purple-50 text-purple-700 border border-purple-200 shadow-sm px-6 py-2 rounded-lg font-black uppercase tracking-widest text-sm hover:bg-purple-100 transition">
+                Load More Reports
+            </button>
+        </div>
+        `;
+    }
+
     gallery.innerHTML = html;
+
+    const loadMoreBtn = document.getElementById('loadMoreBtn');
+    if (loadMoreBtn) {
+        loadMoreBtn.addEventListener('click', () => {
+            currentLimit += 12;
+            refreshUI(false);
+        });
+    }
 }
 
-filterStaff.addEventListener('change', refreshUI);
+filterStaff.addEventListener('change', () => refreshUI(true));
 
 window.deleteReport = async (id) => {
     if (!auth.currentUser) {

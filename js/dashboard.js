@@ -22,29 +22,49 @@ if (btnDesktop) btnDesktop.addEventListener('click', handleLogout);
 const gallery = document.getElementById('gallery');
 const filter = document.getElementById('filterUnit');
 const searchInput = document.getElementById('searchInput');
+const startDate = document.getElementById('startDate');
+const endDate = document.getElementById('endDate');
+const exportCsvBtn = document.getElementById('exportCsvBtn');
 const statsCount = document.getElementById('statsCount');
-
 const ADMIN_PIN = "1234"; // Admin security
 let allReports = [];
+let currentFiltered = [];
+let currentLimit = 12;
 
 onSnapshot(query(collection(db, "reports"), orderBy("createdAt", "desc")), (snap) => {
     allReports = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-    refreshUI();
+    refreshUI(true);
 });
 
-function refreshUI() {
+function refreshUI(resetLimit = false) {
+    if (resetLimit) currentLimit = 12;
+
     const unit = filter.value;
     const search = searchInput.value.toLowerCase();
 
-    const filtered = allReports.filter(item => {
+    const sDate = startDate.value ? new Date(startDate.value) : null;
+    let eDate = endDate.value ? new Date(endDate.value) : null;
+    if (eDate) eDate.setHours(23, 59, 59, 999);
+
+    currentFiltered = allReports.filter(item => {
         const mUnit = unit === "All" || item.unit === unit;
-        const mSearch = item.program.toLowerCase().includes(search) || item.name.toLowerCase().includes(search);
-        return mUnit && mSearch;
+        const mSearch = item.program.toLowerCase().includes(search) || (item.name && item.name.toLowerCase().includes(search));
+
+        let mDate = true;
+        if (sDate || eDate) {
+            const itemDate = new Date(item.date);
+            if (sDate && itemDate < sDate) mDate = false;
+            if (eDate && itemDate > eDate) mDate = false;
+        }
+
+        return mUnit && mSearch && mDate;
     });
 
-    statsCount.innerText = `Showing ${filtered.length} Reports`;
+    statsCount.innerText = `Showing ${currentFiltered.length} Reports`;
 
-    gallery.innerHTML = filtered.map(item => `
+    const paginated = currentFiltered.slice(0, currentLimit);
+
+    let html = paginated.map(item => `
         <div class="bg-white rounded-2xl shadow-sm border border-gray-200 flex flex-col hover:shadow-2xl transition-all duration-500 overflow-hidden">
             <img src="${item.imageUrls?.[0] || 'https://via.placeholder.com/400x250'}" class="w-full h-48 object-cover">
             <div class="p-5 flex-grow">
@@ -54,15 +74,67 @@ function refreshUI() {
                 </h3>
                 <p class="text-xs text-gray-400 mt-2">${item.date} | ${item.name}</p>
             </div>
-            <div class="p-4 bg-gray-50 border-t flex justify-end">
+            <div class="p-4 bg-gray-50 border-t flex justify-between items-center">
+                <span class="text-[10px] text-gray-400 font-bold">REPORTED ON: ${item.createdAt?.toDate?.() ? item.createdAt.toDate().toLocaleDateString() : new Date().toLocaleDateString()}</span>
                 <button onclick="deleteReport('${item.id}')" class="text-red-400 hover:text-red-600 text-[10px] font-black uppercase">Delete</button>
             </div>
         </div>
     `).join('');
+
+    if (currentLimit < currentFiltered.length) {
+        html += `
+        <div class="col-span-full flex justify-center mt-6 mb-4">
+            <button id="loadMoreBtn" class="bg-indigo-50 text-indigo-700 border border-indigo-200 shadow-sm px-6 py-2 rounded-lg font-black uppercase tracking-widest text-sm hover:bg-indigo-100 transition">
+                Load More Reports
+            </button>
+        </div>
+        `;
+    }
+
+    gallery.innerHTML = html;
+
+    const loadMoreBtn = document.getElementById('loadMoreBtn');
+    if (loadMoreBtn) {
+        loadMoreBtn.addEventListener('click', () => {
+            currentLimit += 12;
+            refreshUI(false);
+        });
+    }
 }
 
-filter.addEventListener('change', refreshUI);
-searchInput.addEventListener('input', refreshUI);
+filter.addEventListener('change', () => refreshUI(true));
+searchInput.addEventListener('input', () => refreshUI(true));
+startDate.addEventListener('change', () => refreshUI(true));
+endDate.addEventListener('change', () => refreshUI(true));
+
+if (exportCsvBtn) {
+    exportCsvBtn.addEventListener('click', () => {
+        if (currentFiltered.length === 0) return alert("No reports to export!");
+
+        const headers = ["Date", "Unit", "Staff Name", "Program", "Summary", "Objective", "Full Report"];
+
+        const csvRows = currentFiltered.map(item => {
+            return [
+                item.date || "",
+                item.unit || "",
+                item.name || "",
+                item.program || "",
+                item.description || "",
+                item.objective || "",
+                item.fullReport || ""
+            ].map(val => `"${String(val).replace(/"/g, '""')}"`).join(",");
+        });
+
+        const csvContent = [headers.join(","), ...csvRows].join("\n");
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `eReport_Export_${new Date().toISOString().split('T')[0]}.csv`;
+        a.click();
+        URL.revokeObjectURL(url);
+    });
+}
 
 window.deleteReport = async (id) => {
     if (!auth.currentUser) {
