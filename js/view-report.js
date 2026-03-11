@@ -1,17 +1,13 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { db, auth } from "./firebase-config.js";
 
-const firebaseConfig = {
-    apiKey: "AIzaSyCR9EPwlakRDXN1v6Rm19ro7XvowvBnY2k",
-    authDomain: "jpns-ereport.firebaseapp.com",
-    projectId: "jpns-ereport",
-    storageBucket: "jpns-ereport.firebasestorage.app",
-    messagingSenderId: "928703430086",
-    appId: "1:928703430086:web:273fc8a67f22ce1b9e86c7"
-};
-
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
+// Protected Route Logic
+onAuthStateChanged(auth, (user) => {
+    if (!user) {
+        window.location.replace("login.html");
+    }
+});
 
 const urlParams = new URLSearchParams(window.location.search);
 const reportId = urlParams.get('id');

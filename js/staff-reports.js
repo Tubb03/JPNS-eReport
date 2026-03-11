@@ -1,17 +1,24 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getFirestore, collection, query, orderBy, onSnapshot, doc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { collection, query, orderBy, onSnapshot, doc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { db, auth } from "./firebase-config.js";
 
-const firebaseConfig = {
-    apiKey: "AIzaSyCR9EPwlakRDXN1v6Rm19ro7XvowvBnY2k",
-    authDomain: "jpns-ereport.firebaseapp.com",
-    projectId: "jpns-ereport",
-    storageBucket: "jpns-ereport.firebasestorage.app",
-    messagingSenderId: "928703430086",
-    appId: "1:928703430086:web:273fc8a67f22ce1b9e86c7"
-};
+// Protected Route Logic
+onAuthStateChanged(auth, (user) => {
+    if (!user) {
+        window.location.replace("login.html");
+    } else {
+        const dMobile = document.getElementById('currentUserDisplayMobile');
+        const dDesktop = document.getElementById('currentUserDisplayDesktop');
+        if (dMobile) dMobile.innerText = user.email;
+        if (dDesktop) dDesktop.innerText = user.email;
+    }
+});
 
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
+const handleLogout = () => signOut(auth).then(() => window.location.replace("login.html"));
+const btnMobile = document.getElementById('logoutBtnMobile');
+const btnDesktop = document.getElementById('logoutBtnDesktop');
+if (btnMobile) btnMobile.addEventListener('click', handleLogout);
+if (btnDesktop) btnDesktop.addEventListener('click', handleLogout);
 const gallery = document.getElementById('gallery');
 const filterUnit = document.getElementById('filterUnit');
 const filterStaff = document.getElementById('filterStaff');
@@ -165,8 +172,20 @@ function refreshUI() {
 filterStaff.addEventListener('change', refreshUI);
 
 window.deleteReport = async (id) => {
-    const pin = prompt("Enter Admin PIN:");
-    if (pin === ADMIN_PIN) {
-        if (confirm("Confirm permanent deletion?")) await deleteDoc(doc(db, "reports", id));
-    } else if (pin !== null) alert("Wrong PIN.");
+    if (!auth.currentUser) {
+        alert("You must be logged in to delete reports.");
+        return;
+    }
+
+    // Simplistic check for demo purposes. 
+    // Real security should be implemented via Firestore Security Rules.
+    if (confirm("Confirm permanent deletion?")) {
+        try {
+            await deleteDoc(doc(db, "reports", id));
+            alert("Report deleted.");
+        } catch (error) {
+            console.error("Error deleting document: ", error);
+            alert("Failed to delete report. You might not have permission.");
+        }
+    }
 };

@@ -1,19 +1,20 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
+import { collection, addDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { ref, uploadBytesResumable, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
+import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { db, storage, auth } from "./firebase-config.js";
 
-const firebaseConfig = {
-    apiKey: "AIzaSyCR9EPwlakRDXN1v6Rm19ro7XvowvBnY2k",
-    authDomain: "jpns-ereport.firebaseapp.com",
-    projectId: "jpns-ereport",
-    storageBucket: "jpns-ereport.firebasestorage.app",
-    messagingSenderId: "928703430086",
-    appId: "1:928703430086:web:273fc8a67f22ce1b9e86c7"
-};
+// Protected Route Logic
+onAuthStateChanged(auth, (user) => {
+    if (!user) {
+        window.location.replace("login.html");
+    } else {
+        document.getElementById('currentUserDisplay').innerText = user.email;
+    }
+});
 
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-const storage = getStorage(app);
+document.getElementById('logoutBtn').addEventListener('click', () => {
+    signOut(auth).then(() => window.location.replace("login.html"));
+});
 
 const imageUpload = document.getElementById('imageUpload');
 const previewGallery = document.getElementById('previewGallery');
