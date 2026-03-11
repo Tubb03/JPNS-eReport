@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <title>Full Report View</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="style.css">
     <style>
         @page {
             size: A4 portrait;
@@ -151,69 +152,7 @@
             title="Ian Nathaniel Chew@UNIMAS; LI2026">Kredit</p>
     </footer>
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
-        const firebaseConfig = {
-            apiKey: "AIzaSyCR9EPwlakRDXN1v6Rm19ro7XvowvBnY2k",
-            authDomain: "jpns-ereport.firebaseapp.com",
-            projectId: "jpns-ereport",
-            storageBucket: "jpns-ereport.firebasestorage.app",
-            messagingSenderId: "928703430086",
-            appId: "1:928703430086:web:273fc8a67f22ce1b9e86c7"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-
-        const urlParams = new URLSearchParams(window.location.search);
-        const reportId = urlParams.get('id');
-
-        if (reportId) {
-            const docSnap = await getDoc(doc(db, "reports", reportId));
-            if (docSnap.exists()) {
-                const data = docSnap.data();
-                document.getElementById('vProgram').innerText = data.program;
-                document.getElementById('vUnit').innerText = data.unit;
-                document.getElementById('vDate').innerText = data.date;
-                document.getElementById('vName').innerText = data.name;
-                document.getElementById('vObjective').innerText = data.objective || "N/A";
-                document.getElementById('vFull').innerText = data.fullReport || "N/A";
-
-                const gallery = document.getElementById('vGallery');
-                const images = data.imageUrls || [];
-
-                // Set columns based on count
-                const cols = images.length > 4 ? 4 : images.length;
-                gallery.style.gridTemplateColumns = `repeat(${cols}, minmax(0, 1fr))`;
-
-                images.forEach(url => {
-                    gallery.innerHTML += `
-                        <div class="img-container overflow-hidden shadow-sm">
-                            <img src="${url}" class="w-full h-full object-cover">
-                        </div>`;
-                });
-
-                // Auto-fit text logic to ensure it stays on one page without cutting off manually
-                setTimeout(() => {
-                    const reportBox = document.querySelector('.report-box');
-                    const contentContainer = document.getElementById('vFull').parentElement;
-                    const content = document.getElementById('vFull');
-                    let currentSize = 14; // Start at 14px text
-
-                    // Reduce font size until the total content fits within standard A4 height
-                    const footer = reportBox.querySelector('.mt-auto');
-
-                    while (footer.getBoundingClientRect().bottom > reportBox.getBoundingClientRect().bottom && currentSize > 9) {
-                        currentSize -= 0.5;
-                        content.style.fontSize = currentSize + 'px';
-                        content.style.lineHeight = '1.4';
-                    }
-                }, 800); // Increased timeout to wait for images to paint
-            }
-        }
-    </script>
+    <script src="js/view-report.js" type="module"></script>
 </body>
 
 </html>
