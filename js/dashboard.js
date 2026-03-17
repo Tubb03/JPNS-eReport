@@ -30,6 +30,7 @@ const ADMIN_PIN = "1234"; // Admin security
 let allReports = [];
 let currentFiltered = [];
 let currentLimit = 12;
+let userChartInstance = null;
 
 onSnapshot(query(collection(db, "reports"), orderBy("createdAt", "desc")), (snap) => {
     allReports = snap.docs.map(d => ({ id: d.id, ...d.data() }));
@@ -59,6 +60,8 @@ function refreshUI(resetLimit = false) {
 
         return mUnit && mSearch && mDate;
     });
+
+    renderUserChart(currentFiltered);
 
     statsCount.innerText = `Showing ${currentFiltered.length} Reports`;
 
@@ -98,6 +101,67 @@ function refreshUI(resetLimit = false) {
         loadMoreBtn.addEventListener('click', () => {
             currentLimit += 12;
             refreshUI(false);
+        });
+    }
+}
+
+function renderUserChart(reports) {
+    const ctx = document.getElementById('userReportsChart');
+    if (!ctx) return;
+
+    // Aggregate reports by user
+    const userCounts = {};
+    reports.forEach(r => {
+        const name = r.name || 'Unknown';
+        userCounts[name] = (userCounts[name] || 0) + 1;
+    });
+
+    const labels = Object.keys(userCounts);
+    const data = Object.values(userCounts);
+
+    // Generate colors
+    const backgroundColors = labels.map((_, i) => `hsl(${(i * 360) / Math.max(labels.length, 1)}, 70%, 65%)`);
+
+    if (userChartInstance) {
+        userChartInstance.data.labels = labels;
+        userChartInstance.data.datasets[0].data = data;
+        userChartInstance.data.datasets[0].backgroundColor = backgroundColors;
+        userChartInstance.update();
+    } else {
+        userChartInstance = new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: labels,
+                datasets: [{
+                    data: data,
+                    backgroundColor: backgroundColors,
+                    borderWidth: 1,
+                    borderColor: '#ffffff'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'right',
+                        labels: {
+                            font: {
+                                size: 12,
+                                family: "'Inter', 'Segoe UI', sans-serif"
+                            },
+                            color: '#475569'
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                        padding: 12,
+                        cornerRadius: 8,
+                        titleFont: { size: 13, family: "'Inter', 'Segoe UI', sans-serif" },
+                        bodyFont: { size: 13, family: "'Inter', 'Segoe UI', sans-serif" }
+                    }
+                }
+            }
         });
     }
 }

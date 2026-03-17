@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <title>SSTP-eReport - Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="style.css">
 </head>
 
@@ -69,6 +70,13 @@
                     <button id="logoutBtnDesktop"
                         class="bg-red-50 text-red-600 border border-red-200 px-3 py-1 rounded shadow-sm text-xs font-bold hover:bg-red-100 transition whitespace-nowrap">Logout</button>
                 </div>
+            </div>
+        </div>
+
+        <div class="mb-8 bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
+            <h2 class="text-lg font-bold text-slate-800 mb-4">Reports by User</h2>
+            <div class="relative w-full h-64 flex justify-center">
+                <canvas id="userReportsChart"></canvas>
             </div>
         </div>
 
