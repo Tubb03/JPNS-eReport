@@ -6,7 +6,7 @@
     <title>SSTP LaporKini - Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="{{ asset('style.css') }}">
 </head>
 
 <body class="bg-gray-100 p-6">
@@ -14,7 +14,7 @@
         <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
             <div class="flex items-center justify-between w-full md:w-auto">
                 <div class="flex items-center gap-3">
-                    <img src="KPM Logo.png" alt="Logo" class="h-12 w-auto">
+                    <img src="{{ asset('KPM Logo.png') }}" alt="Logo" class="h-12 w-auto">
                     <div>
                         <h1 class="text-3xl font-black text-blue-900 italic leading-none">LaporKini</h1>
                         <p class="text-xs font-bold text-gray-400 uppercase tracking-widest">Sektor Sumber dan Teknologi
@@ -59,10 +59,10 @@
                     class="bg-emerald-600 text-white px-5 py-2 rounded-lg font-black shadow-md hover:bg-emerald-700 transition">
                     EXPORT CSV
                 </button>
-                <a href="staff-reports.html"
+                <a href="{{ url('/reports/staff') }}"
                     class="bg-purple-600 text-white px-5 py-2 rounded-lg font-black shadow-md hover:bg-purple-700 transition">STAFF
                     REPORTS</a>
-                <a href="index.html"
+                <a href="{{ url('/reports/create') }}"
                     class="bg-blue-600 text-white px-5 py-2 rounded-lg font-black shadow-md hover:bg-blue-700 transition">+
                     NEW REPORT</a>
                 <div class="hidden md:flex flex-col items-end ml-2 border-l pl-4 border-gray-300">
@@ -92,7 +92,13 @@
             title="Ian Nathaniel Chew@UNIMAS; LI2026">Kredit</p>
     </footer>
 
-    <script src="js/dashboard.js" type="module"></script>
+    <script>
+        window.LaravelReports = @json($reports);
+        window.CurrentUserEmail = "{{ auth()->user()->email ?? '' }}";
+        window.LogoutRoute = "{{ route('logout') }}";
+        window.csrfToken = "{{ csrf_token() }}";
+    </script>
+    <script src="{{ asset('js/dashboard.js') }}"></script>
 </body>
 
 </html>
