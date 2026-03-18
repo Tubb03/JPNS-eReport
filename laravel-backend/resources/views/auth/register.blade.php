@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>SSTP LaporKini - Login</title>
+    <title>SSTP LaporKini - Register</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="{{ asset('style.css') }}">
 </head>
@@ -20,31 +20,45 @@
             </div>
         </div>
 
-        <h2 class="text-xl font-black text-slate-800 mb-6">Staff Login Portal</h2>
+        <h2 class="text-xl font-black text-slate-800 mb-6">Staff Registration</h2>
 
-        <form action="{{ route('login') }}" method="POST" class="space-y-4">
+        <form action="{{ route('register.post') }}" method="POST" class="space-y-4">
             @csrf
+            <div>
+                <input type="text" name="name" id="name" placeholder="Full Name" value="{{ old('name') }}" aria-label="Staff Full Name" required
+                    class="w-full p-3 border rounded-lg shadow-sm outline-none focus:ring-2 focus:ring-blue-400 bg-gray-50 text-sm">
+            </div>
             <div>
                 <input type="email" name="email" id="email" placeholder="Staff Email" value="{{ old('email') }}" aria-label="Staff Email Address" required
                     class="w-full p-3 border rounded-lg shadow-sm outline-none focus:ring-2 focus:ring-blue-400 bg-gray-50 text-sm">
             </div>
             <div>
-                <input type="password" name="password" id="password" placeholder="Password" aria-label="Password" required
+                <input type="password" name="password" id="password" placeholder="Password (Min 8 characters)" aria-label="Password" required minlength="8"
+                    class="w-full p-3 border rounded-lg shadow-sm outline-none focus:ring-2 focus:ring-blue-400 bg-gray-50 text-sm">
+            </div>
+            <div>
+                <input type="password" name="password_confirmation" id="password_confirmation" placeholder="Confirm Password" aria-label="Confirm Password" required minlength="8"
                     class="w-full p-3 border rounded-lg shadow-sm outline-none focus:ring-2 focus:ring-blue-400 bg-gray-50 text-sm">
             </div>
             
             @if ($errors->any())
-                <p class="text-red-500 text-xs font-bold uppercase tracking-wider">{{ $errors->first() }}</p>
+                <div class="bg-red-50 text-red-600 p-3 rounded-lg text-xs font-bold border border-red-200 text-left">
+                    <ul class="list-disc pl-4">
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
             @endif
 
             <button type="submit"
                 class="w-full bg-blue-600 text-white py-3 rounded-xl font-black text-base hover:bg-blue-700 transition shadow-md uppercase tracking-widest mt-2">
-                Log In
+                Register
             </button>
         </form>
 
         <div class="mt-6 text-sm font-semibold text-gray-500">
-            Don't have an account? <a href="{{ route('register') }}" class="text-blue-600 hover:underline">Register here</a>
+            Already have an account? <a href="{{ route('login') }}" class="text-blue-600 hover:underline">Log in here</a>
         </div>
     </div>
 </body>
