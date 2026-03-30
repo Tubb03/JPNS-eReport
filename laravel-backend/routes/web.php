@@ -15,6 +15,9 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ReportController;
+use App\Http\Controllers\MigrationController;
+
+Route::post('/api/migrate-firebase', [MigrationController::class, 'importFirebase'])->name('api.migrate');
 
 Route::middleware('auth')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
