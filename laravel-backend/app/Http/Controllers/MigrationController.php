@@ -40,9 +40,9 @@ class MigrationController extends Controller
                 'unit' => $fb['unit'] ?? 'Unknown Unit',
                 'program_name' => $fb['program'] ?? 'Unknown Program',
                 'program_date' => $fb['date'] ?? date('Y-m-d'),
-                'description' => $fb['description'] ?? null,
-                'objective' => $fb['objective'] ?? null,
-                'full_report' => $fb['fullReport'] ?? null,
+                'description' => $fb['description'] ?? '',
+                'objective' => $fb['objective'] ?? '',
+                'full_report' => $fb['fullReport'] ?? '',
                 'created_at' => $createdAt,
                 'updated_at' => $createdAt
             ]);
