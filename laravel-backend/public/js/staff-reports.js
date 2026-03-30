@@ -167,7 +167,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (confirm("Confirm permanent deletion?")) {
             try {
-                const response = await fetch(\`/reports/\${id}\`, {
+                const response = await fetch(`/reports/${id}`, {
                     method: 'DELETE',
                     headers: {
                         'X-CSRF-TOKEN': window.csrfToken,
