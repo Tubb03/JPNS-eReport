@@ -86,7 +86,7 @@
             <div class="flex items-center gap-4">
                 <img src="{{ asset('KPM Logo.png') }}" alt="Logo" class="h-12 w-auto object-contain">
                 <div>
-                    <h1 class="text-3xl font-black text-blue-900 italic leading-none mb-1">LaporKini</h1>
+                    <h1 class="text-2xl md:text-3xl font-black text-blue-900 tracking-tight leading-none mb-1">One Page Report</h1>
                     <p class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Sektor Sumber dan Teknologi
                         Pendidikan</p>
                 </div>

@@ -35,7 +35,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let allReports = window.LaravelReports || [];
     let currentFiltered = [];
     let currentLimit = 12;
-    let userChartInstance = null;
+    let unitChartInstance = null;
 
     function refreshUI(resetLimit = false) {
         if (resetLimit) currentLimit = 12;
@@ -48,7 +48,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (eDate) eDate.setHours(23, 59, 59, 999);
 
         currentFiltered = allReports.filter(item => {
-            const mUnit = unit === "All" || item.unit === unit;
+            const mUnit = unit === "All" || unit === "" || item.unit === unit;
             
             const progName = item.program_name || item.program || '';
             const userName = item.user?.name || item.name || '';
@@ -64,7 +64,7 @@ document.addEventListener('DOMContentLoaded', () => {
             return mUnit && mSearch && mDate;
         });
 
-        renderUserChart(currentFiltered);
+        renderUnitChart(currentFiltered);
 
         statsCount.innerText = `Showing ${currentFiltered.length} Reports`;
 
@@ -116,8 +116,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    function renderUserChart(reports) {
-        const ctx = document.getElementById('userReportsChart');
+    function renderUnitChart(reports) {
+        const ctx = document.getElementById('unitReportsChart');
         if (!ctx) return;
 
         const userCounts = {};
@@ -131,13 +131,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const backgroundColors = labels.map((_, i) => `hsl(${(i * 360) / Math.max(labels.length, 1)}, 70%, 65%)`);
 
-        if (userChartInstance) {
-            userChartInstance.data.labels = labels;
-            userChartInstance.data.datasets[0].data = data;
-            userChartInstance.data.datasets[0].backgroundColor = backgroundColors;
-            userChartInstance.update();
+        if (unitChartInstance) {
+            unitChartInstance.data.labels = labels;
+            unitChartInstance.data.datasets[0].data = data;
+            unitChartInstance.data.datasets[0].backgroundColor = backgroundColors;
+            unitChartInstance.update();
         } else {
-            userChartInstance = new Chart(ctx, {
+            unitChartInstance = new Chart(ctx, {
                 type: 'pie',
                 data: {
                     labels: labels,
@@ -187,7 +187,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const url = URL.createObjectURL(blob);
             const a = document.createElement("a");
             a.href = url;
-            a.download = `LaporKini_Export_${new Date().toISOString().split('T')[0]}.csv`;
+            a.download = `One_Page_Report_Export_${new Date().toISOString().split('T')[0]}.csv`;
             a.click();
             URL.revokeObjectURL(url);
         });

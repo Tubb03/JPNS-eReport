@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SSTP LaporKini - Submit</title>
+    <title>SSTP One Page Report - Submit</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="style.css">
 </head>
@@ -15,7 +15,7 @@
             <div class="flex items-center gap-3">
                 <img src="KPM Logo.png" alt="Logo" class="h-12 w-auto">
                 <div>
-                    <h1 class="text-3xl font-black text-blue-900 italic leading-none">LaporKini</h1>
+                    <h1 class="text-2xl md:text-3xl font-black text-blue-900 tracking-tight leading-none">One Page Report</h1>
                     <p class="text-xs font-bold text-gray-400 uppercase tracking-widest">Sektor Sumber dan Teknologi
                         Pendidikan</p>
                 </div>
@@ -39,16 +39,16 @@
                 aria-label="Program or Activity Title" required
                 class="w-full p-2 border rounded shadow-sm outline-none focus:ring-2 focus:ring-blue-400">
 
-            <select id="unit" aria-label="Unit Selection"
+            <input list="unit-list" id="unit" aria-label="Unit Selection" placeholder="Select or search unit..."
                 class="w-full p-2 border rounded bg-white shadow-sm outline-none focus:ring-2 focus:ring-blue-400">
-                <option value="Unit Dasar dan Latihan">Unit Dasar dan Latihan</option>
-                <option value="Unit Pengurusan Pusat Sumber">Unit Pengurusan Pusat Sumber</option>
-                <option value="Unit Pendidikan Digital">Unit Pendidikan Digital</option>
-                <option value="Unit Rakaman dan Penyiaran">Unit Rakaman dan Penyiaran</option>
-                <option value="Unit Pembangunan dan Bahan Interaktif">Unit Pembangunan dan Bahan Interaktif</option>
-                <option value="Unit Pelantar Pembelajaran">Unit Pelantar Pembelajaran
-                </option>
-            </select>
+            <datalist id="unit-list">
+                <option value="Unit Dasar dan Latihan">
+                <option value="Unit Pengurusan Pusat Sumber">
+                <option value="Unit Pendidikan Digital">
+                <option value="Unit Rakaman dan Penyiaran">
+                <option value="Unit Pembangunan dan Bahan Interaktif">
+                <option value="Unit Pelantar Pembelajaran">
+            </datalist>
 
             <textarea id="description" rows="2" placeholder="Short Summary (for Dashboard)" aria-label="Short Summary"
                 class="w-full p-2 border rounded outline-none focus:ring-2 focus:ring-blue-400 shadow-sm"></textarea>

@@ -30,7 +30,7 @@ const ADMIN_PIN = "1234"; // Admin security
 let allReports = [];
 let currentFiltered = [];
 let currentLimit = 12;
-let userChartInstance = null;
+let unitChartInstance = null;
 
 onSnapshot(query(collection(db, "reports"), orderBy("createdAt", "desc")), (snap) => {
     allReports = snap.docs.map(d => ({ id: d.id, ...d.data() }));
@@ -48,7 +48,7 @@ function refreshUI(resetLimit = false) {
     if (eDate) eDate.setHours(23, 59, 59, 999);
 
     currentFiltered = allReports.filter(item => {
-        const mUnit = unit === "All" || item.unit === unit;
+        const mUnit = unit === "All" || unit === "" || item.unit === unit;
         const mSearch = item.program.toLowerCase().includes(search) || (item.name && item.name.toLowerCase().includes(search));
 
         let mDate = true;
@@ -61,7 +61,7 @@ function refreshUI(resetLimit = false) {
         return mUnit && mSearch && mDate;
     });
 
-    renderUserChart(currentFiltered);
+    renderUnitChart(currentFiltered);
 
     statsCount.innerText = `Showing ${currentFiltered.length} Reports`;
 
@@ -105,30 +105,30 @@ function refreshUI(resetLimit = false) {
     }
 }
 
-function renderUserChart(reports) {
-    const ctx = document.getElementById('userReportsChart');
+function renderUnitChart(reports) {
+    const ctx = document.getElementById('unitReportsChart');
     if (!ctx) return;
 
-    // Aggregate reports by user
-    const userCounts = {};
+    // Aggregate reports by unit
+    const unitCounts = {};
     reports.forEach(r => {
-        const name = r.name || 'Unknown';
-        userCounts[name] = (userCounts[name] || 0) + 1;
+        const unit = r.unit || 'Unknown';
+        unitCounts[unit] = (unitCounts[unit] || 0) + 1;
     });
 
-    const labels = Object.keys(userCounts);
-    const data = Object.values(userCounts);
+    const labels = Object.keys(unitCounts);
+    const data = Object.values(unitCounts);
 
     // Generate colors
     const backgroundColors = labels.map((_, i) => `hsl(${(i * 360) / Math.max(labels.length, 1)}, 70%, 65%)`);
 
-    if (userChartInstance) {
-        userChartInstance.data.labels = labels;
-        userChartInstance.data.datasets[0].data = data;
-        userChartInstance.data.datasets[0].backgroundColor = backgroundColors;
-        userChartInstance.update();
+    if (unitChartInstance) {
+        unitChartInstance.data.labels = labels;
+        unitChartInstance.data.datasets[0].data = data;
+        unitChartInstance.data.datasets[0].backgroundColor = backgroundColors;
+        unitChartInstance.update();
     } else {
-        userChartInstance = new Chart(ctx, {
+        unitChartInstance = new Chart(ctx, {
             type: 'pie',
             data: {
                 labels: labels,
@@ -194,7 +194,7 @@ if (exportCsvBtn) {
         const url = URL.createObjectURL(blob);
         const a = document.createElement("a");
         a.href = url;
-        a.download = `LaporKini_Export_${new Date().toISOString().split('T')[0]}.csv`;
+        a.download = `One_Page_Report_Export_${new Date().toISOString().split('T')[0]}.csv`;
         a.click();
         URL.revokeObjectURL(url);
     });

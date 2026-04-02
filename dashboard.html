@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>SSTP LaporKini - Dashboard</title>
+    <title>SSTP One Page Report - Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="style.css">
@@ -16,7 +16,7 @@
                 <div class="flex items-center gap-3">
                     <img src="KPM Logo.png" alt="Logo" class="h-12 w-auto">
                     <div>
-                        <h1 class="text-3xl font-black text-blue-900 italic leading-none">LaporKini</h1>
+                        <h1 class="text-2xl md:text-3xl font-black text-blue-900 tracking-tight leading-none">One Page Report</h1>
                         <p class="text-xs font-bold text-gray-400 uppercase tracking-widest">Sektor Sumber dan Teknologi
                             Pendidikan</p>
                     </div>
@@ -35,17 +35,17 @@
                         class="p-2 pl-9 border rounded-lg bg-white shadow-sm outline-none focus:ring-2 focus:ring-blue-400 w-64 text-sm">
                     <span class="absolute left-3 top-2.5 opacity-30" aria-hidden="true">🔍</span>
                 </div>
-                <select id="filterUnit" aria-label="Filter by Unit"
-                    class="p-2 border rounded-lg bg-white shadow-sm outline-none focus:ring-2 focus:ring-blue-400 text-sm font-semibold">
-                    <option value="All">All Units</option>
-                    <option value="Unit Dasar dan Latihan">Unit Dasar dan Latihan</option>
-                    <option value="Unit Pengurusan Pusat Sumber">Unit Pengurusan Pusat Sumber</option>
-                    <option value="Unit Pendidikan Digital">Unit Pendidikan Digital</option>
-                    <option value="Unit Rakaman dan Penyiaran">Unit Rakaman dan Penyiaran</option>
-                    <option value="Unit Pembangunan dan Bahan Interaktif">Unit Pembangunan dan Bahan Interaktif</option>
-                    <option value="Unit Pelantar Pembelajaran">Unit Pelantar Pembelajaran
-                    </option>
-                </select>
+                <input list="unit-filter-list" id="filterUnit" aria-label="Filter by Unit" placeholder="All Units" value="All"
+                    class="p-2 border rounded-lg bg-white shadow-sm outline-none focus:ring-2 focus:ring-blue-400 text-sm font-semibold w-48">
+                <datalist id="unit-filter-list">
+                    <option value="All">
+                    <option value="Unit Dasar dan Latihan">
+                    <option value="Unit Pengurusan Pusat Sumber">
+                    <option value="Unit Pendidikan Digital">
+                    <option value="Unit Rakaman dan Penyiaran">
+                    <option value="Unit Pembangunan dan Bahan Interaktif">
+                    <option value="Unit Pelantar Pembelajaran">
+                </datalist>
                 <div class="flex items-center gap-2 border bg-white rounded-lg shadow-sm px-3 py-1.5 focus-within:ring-2 focus-within:ring-emerald-400 transition"
                     role="group" aria-label="Date Range Filter">
                     <span class="text-[10px] font-black text-emerald-600 tracking-wider">FROM</span>
@@ -74,9 +74,9 @@
         </div>
 
         <div class="mb-8 bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
-            <h2 class="text-lg font-bold text-slate-800 mb-4">Reports by User</h2>
+            <h2 class="text-lg font-bold text-slate-800 mb-4">Reports by Unit</h2>
             <div class="relative w-full h-64 flex justify-center">
-                <canvas id="userReportsChart"></canvas>
+                <canvas id="unitReportsChart"></canvas>
             </div>
         </div>
 

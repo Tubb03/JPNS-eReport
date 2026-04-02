@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>SSTP LaporKini - Login</title>
+    <title>SSTP One Page Report - Login</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="{{ asset('style.css') }}">
 </head>
@@ -13,7 +13,7 @@
         <div class="flex items-center justify-center gap-3 mb-6">
             <img src="{{ asset('KPM Logo.png') }}" alt="Logo" class="h-16 w-auto">
             <div class="text-left">
-                <h1 class="text-3xl font-black text-blue-900 italic leading-none">LaporKini</h1>
+                <h1 class="text-2xl md:text-3xl font-black text-blue-900 tracking-tight leading-none">One Page Report</h1>
                 <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest leading-tight">
                     Sektor Sumber dan<br>Teknologi Pendidikan
                 </p>
