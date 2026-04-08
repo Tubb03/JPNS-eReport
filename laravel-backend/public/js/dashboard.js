@@ -120,14 +120,14 @@ document.addEventListener('DOMContentLoaded', () => {
         const ctx = document.getElementById('unitReportsChart');
         if (!ctx) return;
 
-        const userCounts = {};
+        const unitCounts = {};
         reports.forEach(r => {
-            const name = r.user?.name || r.name || 'Unknown';
-            userCounts[name] = (userCounts[name] || 0) + 1;
+            const unit = r.unit || 'Unknown';
+            unitCounts[unit] = (unitCounts[unit] || 0) + 1;
         });
 
-        const labels = Object.keys(userCounts);
-        const data = Object.values(userCounts);
+        const labels = Object.keys(unitCounts);
+        const data = Object.values(unitCounts);
 
         const backgroundColors = labels.map((_, i) => `hsl(${(i * 360) / Math.max(labels.length, 1)}, 70%, 65%)`);
 
