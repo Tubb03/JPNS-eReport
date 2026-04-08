@@ -29,6 +29,7 @@
             </div>
             <div>
                 <input type="password" id="password" placeholder="Password" aria-label="Password" required
+                    title="Enter your IC no." oninvalid="this.setCustomValidity('Enter your IC no.')" oninput="this.setCustomValidity('')"
                     class="w-full p-3 border rounded-lg shadow-sm outline-none focus:ring-2 focus:ring-blue-400 bg-gray-50 text-sm">
             </div>
             <p id="errorMsg" class="text-red-500 text-xs font-bold hidden uppercase tracking-wider"></p>
