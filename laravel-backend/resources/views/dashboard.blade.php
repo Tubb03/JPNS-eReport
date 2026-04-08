@@ -65,6 +65,11 @@
                 <a href="{{ url('/reports/create') }}"
                     class="bg-blue-600 text-white px-5 py-2 rounded-lg font-black shadow-md hover:bg-blue-700 transition">+
                     NEW REPORT</a>
+                @if(auth()->user()->role === 'admin')
+                <a href="{{ route('admin.users.index') }}"
+                    class="bg-slate-800 text-white px-5 py-2 rounded-lg font-black shadow-md hover:bg-slate-900 transition flex items-center justify-center">
+                    MANAGE USERS</a>
+                @endif
                 <div class="hidden md:flex flex-col items-end ml-2 border-l pl-4 border-gray-300">
                     <p id="currentUserDisplayDesktop" class="text-xs font-bold text-gray-600 mb-1"></p>
                     <button id="logoutBtnDesktop"
