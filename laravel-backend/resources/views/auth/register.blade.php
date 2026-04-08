@@ -34,10 +34,12 @@
             </div>
             <div>
                 <input type="password" name="password" id="password" placeholder="Password (Min 8 characters)" aria-label="Password" required minlength="8"
+                    title="Enter your IC no." oninvalid="this.setCustomValidity('Enter your IC no.')" oninput="this.setCustomValidity('')"
                     class="w-full p-3 border rounded-lg shadow-sm outline-none focus:ring-2 focus:ring-blue-400 bg-gray-50 text-sm">
             </div>
             <div>
                 <input type="password" name="password_confirmation" id="password_confirmation" placeholder="Confirm Password" aria-label="Confirm Password" required minlength="8"
+                    title="Enter your IC no." oninvalid="this.setCustomValidity('Enter your IC no.')" oninput="this.setCustomValidity('')"
                     class="w-full p-3 border rounded-lg shadow-sm outline-none focus:ring-2 focus:ring-blue-400 bg-gray-50 text-sm">
             </div>
             
