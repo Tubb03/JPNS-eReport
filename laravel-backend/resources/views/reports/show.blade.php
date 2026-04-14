@@ -73,7 +73,14 @@
     <div class="w-full max-w-[210mm] flex justify-end gap-3 mb-4 no-print shrink-0 mx-auto">
         <button onclick="window.location.href='{{ route('dashboard') }}'"
             class="bg-white border text-gray-700 px-6 py-2 rounded shadow-sm text-sm font-bold hover:bg-gray-50 transition-colors">Back</button>
-        <button onclick="window.print()"
+            
+        @if(auth()->id() === $report->user_id || auth()->user()->role === 'admin')
+        <button onclick="window.location.href='{{ route('reports.edit', $report) }}'"
+            class="bg-emerald-600 text-white px-6 py-2 rounded shadow-sm text-sm font-bold hover:bg-emerald-700 transition-colors">Edit
+            Report</button>
+        @endif
+        
+        <button onclick="window.location.href='{{ route('reports.pdf', $report) }}'"
             class="bg-blue-600 text-white px-6 py-2 rounded shadow-sm text-sm font-bold hover:bg-blue-700 transition-colors">Download
             PDF</button>
     </div>

@@ -48,7 +48,7 @@
             </div>
 
             <input type="text" name="program_name" id="programName" placeholder="Program/Activity Title"
-                aria-label="Program or Activity Title" required value="{{ old('program_name') }}"
+                aria-label="Program or Activity Title" required value="{{ old('program_name') }}" maxlength="100"
                 class="w-full p-2 border rounded shadow-sm outline-none focus:ring-2 focus:ring-blue-400">
 
             <input list="unit-list" name="unit" id="unit" aria-label="Unit Selection" placeholder="Select or search unit..."
@@ -63,23 +63,25 @@
                 <option value="Unit Pelantar Pembelajaran">
             </datalist>
 
-            <textarea name="description" id="description" rows="2" placeholder="Short Summary (for Dashboard)" aria-label="Short Summary"
+            <textarea name="description" id="description" rows="2" placeholder="Short Summary (for Dashboard)" aria-label="Short Summary" maxlength="150"
                 class="w-full p-2 border rounded outline-none focus:ring-2 focus:ring-blue-400 shadow-sm">{{ old('description') }}</textarea>
             
             <div>
-                <textarea name="objective" id="objective" rows="2" placeholder="Program Objective" aria-label="Program Objective"
+                <textarea name="objective" id="objective" rows="2" placeholder="Program Objective" aria-label="Program Objective" maxlength="300"
                     class="w-full p-2 border rounded outline-none focus:ring-2 focus:ring-blue-400 shadow-sm">{{ old('objective') }}</textarea>
-                <div class="text-right text-[11px] text-gray-500 mt-1 font-semibold tracking-wide">
-                    Word count: <span id="objectiveWordCount" class="text-blue-600">0</span> <span class="text-gray-400">/ ~50 (Recommended)</span>
+                <div class="text-right text-[11px] text-gray-500 mt-1 font-semibold tracking-wide flex justify-between">
+                    <span class="text-red-500 font-black tracking-widest uppercase text-[10px]">Strict: Max 300 Characters</span>
+                    <span>Word count: <span id="objectiveWordCount" class="text-blue-600">0</span></span>
                 </div>
             </div>
             
             <div>
                 <textarea name="full_report" id="fullReport" rows="5" placeholder="Detailed Report Content"
-                    aria-label="Detailed Report Content" required
+                    aria-label="Detailed Report Content" required maxlength="1500"
                     class="w-full p-2 border rounded outline-none focus:ring-2 focus:ring-blue-400 shadow-sm">{{ old('full_report') }}</textarea>
-                <div class="text-right text-[11px] text-gray-500 mt-1 font-semibold tracking-wide">
-                    Word count: <span id="fullReportWordCount" class="text-blue-600">0</span> <span class="text-gray-400">/ ~250 (Recommended)</span>
+                <div class="text-right text-[11px] text-gray-500 mt-1 font-semibold tracking-wide flex justify-between">
+                    <span class="text-red-500 font-black tracking-widest uppercase text-[10px]">Strict: Max 1500 Characters</span>
+                    <span>Word count: <span id="fullReportWordCount" class="text-blue-600">0</span></span>
                 </div>
             </div>
 
