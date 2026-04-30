@@ -55,9 +55,9 @@
                     <input type="date" id="endDate" aria-label="End Date"
                         class="outline-none text-sm font-semibold text-slate-700 bg-transparent cursor-pointer">
                 </div>
-                <button id="exportCsvBtn"
-                    class="bg-emerald-600 text-white px-5 py-2 rounded-lg font-black shadow-md hover:bg-emerald-700 transition">
-                    EXPORT CSV
+                <button id="exportPdfBtn"
+                    class="bg-red-600 text-white px-5 py-2 rounded-lg font-black shadow-md hover:bg-red-700 transition">
+                    EXPORT PDF
                 </button>
                 <a href="{{ url('/reports/staff') }}"
                     class="bg-purple-600 text-white px-5 py-2 rounded-lg font-black shadow-md hover:bg-purple-700 transition">STAFF

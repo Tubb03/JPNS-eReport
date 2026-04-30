@@ -29,7 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const searchInput = document.getElementById('searchInput');
     const startDate = document.getElementById('startDate');
     const endDate = document.getElementById('endDate');
-    const exportCsvBtn = document.getElementById('exportCsvBtn');
+    const exportPdfBtn = document.getElementById('exportPdfBtn');
     const statsCount = document.getElementById('statsCount');
     
     let allReports = window.LaravelReports || [];
@@ -165,31 +165,44 @@ document.addEventListener('DOMContentLoaded', () => {
     startDate.addEventListener('change', () => refreshUI(true));
     endDate.addEventListener('change', () => refreshUI(true));
 
-    if (exportCsvBtn) {
-        exportCsvBtn.addEventListener('click', () => {
+    if (exportPdfBtn) {
+        exportPdfBtn.addEventListener('click', async () => {
             if (currentFiltered.length === 0) return alert("No reports to export!");
 
-            const headers = ["Date", "Unit", "Staff Name", "Program", "Summary", "Objective", "Full Report"];
-            const csvRows = currentFiltered.map(item => {
-                return [
-                    item.program_date || item.date || "",
-                    item.unit || "",
-                    item.user?.name || item.name || "",
-                    item.program_name || item.program || "",
-                    item.description || "",
-                    item.objective || "",
-                    item.full_report || item.fullReport || ""
-                ].map(val => `"${String(val).replace(/"/g, '""')}"`).join(",");
-            });
+            const originalText = exportPdfBtn.innerText;
+            exportPdfBtn.innerText = 'GENERATING PDF...';
+            exportPdfBtn.disabled = true;
 
-            const csvContent = [headers.join(","), ...csvRows].join("\n");
-            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement("a");
-            a.href = url;
-            a.download = `One_Page_Report_Export_${new Date().toISOString().split('T')[0]}.csv`;
-            a.click();
-            URL.revokeObjectURL(url);
+            try {
+                const response = await fetch('/reports/export-pdf', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': window.csrfToken
+                    },
+                    body: JSON.stringify({
+                        ids: currentFiltered.map(item => item.id)
+                    })
+                });
+
+                if (!response.ok) throw new Error('Failed to generate PDF');
+
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `Exported_Reports_${new Date().toISOString().split('T')[0]}.pdf`;
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+                window.URL.revokeObjectURL(url);
+            } catch (error) {
+                console.error('Error generating PDF:', error);
+                alert('Failed to generate PDF. Please try again.');
+            } finally {
+                exportPdfBtn.innerText = originalText;
+                exportPdfBtn.disabled = false;
+            }
         });
     }
 

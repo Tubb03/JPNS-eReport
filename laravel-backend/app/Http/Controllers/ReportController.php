@@ -153,4 +153,21 @@ class ReportController extends Controller
         
         return $pdf->download($filename);
     }
+
+    public function exportPdf(Request $request)
+    {
+        $request->validate([
+            'ids' => 'required|array',
+            'ids.*' => 'integer|exists:reports,id'
+        ]);
+
+        $reports = Report::with(['images', 'user'])->whereIn('id', $request->ids)->get();
+
+        $pdf = Pdf::loadView('reports.export_pdf', compact('reports'));
+        $pdf->setPaper('A4', 'portrait');
+
+        $filename = 'Exported_Reports_' . date('Y-m-d') . '.pdf';
+
+        return $pdf->download($filename);
+    }
 }

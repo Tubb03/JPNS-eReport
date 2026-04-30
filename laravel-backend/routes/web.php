@@ -26,6 +26,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/reports/{report}/edit', [ReportController::class, 'edit'])->name('reports.edit');
     Route::put('/reports/{report}', [ReportController::class, 'update'])->name('reports.update');
     Route::get('/reports/staff', [ReportController::class, 'staff'])->name('reports.staff');
+    Route::post('/reports/export-pdf', [ReportController::class, 'exportPdf'])->name('reports.export-pdf');
     Route::get('/reports/{report}/pdf', [ReportController::class, 'downloadPdf'])->name('reports.pdf');
     Route::get('/reports/{report}', [ReportController::class, 'show'])->name('reports.show');
     Route::delete('/reports/{report}', [ReportController::class, 'destroy'])->name('reports.destroy');
