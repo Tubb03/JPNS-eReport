@@ -24,7 +24,7 @@ class ReportController extends Controller
             'description' => 'nullable|string|max:150',
             'objective' => 'nullable|string|max:300',
             'full_report' => 'required|string|max:1500',
-            'images' => 'required|array',
+            'images' => 'nullable|array',
             'images.*' => 'image|max:5120' // Max 5MB per image
         ]);
 

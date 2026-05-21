@@ -86,8 +86,8 @@
             </div>
 
             <div class="bg-blue-50 p-6 rounded-xl border-2 border-dashed border-blue-200">
-                <label class="block text-sm font-bold text-blue-800 mb-2">Upload Program Photos (Multiple)</label>
-                <input type="file" name="images[]" id="imageUpload" accept="image/*" aria-label="Upload Program Photos" multiple required
+                <label class="block text-sm font-bold text-blue-800 mb-2">Upload Program Photos (Optional)</label>
+                <input type="file" name="images[]" id="imageUpload" accept="image/*" aria-label="Upload Program Photos" multiple
                     class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-700 cursor-pointer">
                 <div id="previewGallery" class="grid grid-cols-3 sm:grid-cols-4 gap-2 mt-4"></div>
             </div>
