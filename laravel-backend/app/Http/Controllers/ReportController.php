@@ -90,7 +90,7 @@ class ReportController extends Controller
         ]);
 
         if ($request->has('images_toremove')) {
-            $imagesToDelete = ReportImage::whereIn('id', $validated['images_toremove'])->where('report_id', $report->id)->get();
+            $imagesToDelete = $report->images()->whereIn('id', $validated['images_toremove'])->get();
             foreach ($imagesToDelete as $img) {
                 $relativePath = str_replace('/storage/', '', $img->image_path);
                 Storage::disk('public')->delete($relativePath);
