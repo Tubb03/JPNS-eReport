@@ -10,14 +10,29 @@ document.addEventListener('DOMContentLoaded', () => {
     let allReports = window.LaravelReports || [];
     let currentLimit = 12;
 
-    const staffByUnit = {
-        "Unit Dasar dan Latihan": ["Julai Bin David Jipin @ Gipin", "Desmond Ak Sandum"],
-        "Unit Pengurusan Pusat Sumber": ["Pawasia Binti Baha"],
-        "Unit Pendidikan Digital": ["JC Jane Canisius James"],
-        "Unit Rakaman dan Penyiaran": ["Soenizal Bin Awang Mokhtar"],
-        "Unit Pembangunan dan Bahan Interaktif": ["Cornelia Audrey Mudi"],
-        "Unit Pelantar Pembelajaran": ["Razmeh Bin Rahman"]
-    };
+    const staffByUnit = {};
+    allReports.forEach(item => {
+        const unit = item.unit;
+        const staffName = item.user?.name || item.name;
+        if (unit && staffName) {
+            if (!staffByUnit[unit]) {
+                staffByUnit[unit] = new Set();
+            }
+            staffByUnit[unit].add(staffName);
+        }
+    });
+
+    for (const unit in staffByUnit) {
+        staffByUnit[unit] = Array.from(staffByUnit[unit]).sort();
+    }
+
+    filterUnit.innerHTML = '<option value="All">All Units</option>';
+    Object.keys(staffByUnit).sort().forEach(unit => {
+        const option = document.createElement('option');
+        option.value = unit;
+        option.textContent = unit;
+        filterUnit.appendChild(option);
+    });
 
     filterUnit.addEventListener('change', () => {
         const unit = filterUnit.value;

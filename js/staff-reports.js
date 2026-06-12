@@ -30,14 +30,7 @@ const ADMIN_PIN = "1234";
 let allReports = [];
 let currentLimit = 12;
 
-const staffByUnit = {
-    "Unit Dasar dan Latihan": ["Julai Bin David Jipin @ Gipin", "Desmond Ak Sandum"],
-    "Unit Pengurusan Pusat Sumber": ["Pawasia Binti Baha"],
-    "Unit Pendidikan Digital": ["JC Jane Canisius James"],
-    "Unit Rakaman dan Penyiaran": ["Soenizal Bin Awang Mokhtar"],
-    "Unit Pembangunan dan Bahan Interaktif": ["Cornelia Audrey Mudi"],
-    "Unit Pelantar Pembelajaran": ["Razmeh Bin Rahman"]
-};
+let staffByUnit = {};
 
 // Populate Staff dropdown based on Unit selection
 filterUnit.addEventListener('change', () => {
@@ -63,12 +56,36 @@ filterUnit.addEventListener('change', () => {
     refreshUI();
 });
 
-// Initialize empty staff list (All)
-filterUnit.dispatchEvent(new Event('change'));
-
 onSnapshot(query(collection(db, "reports"), orderBy("createdAt", "desc")), (snap) => {
     allReports = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-    refreshUI(true);
+    
+    staffByUnit = {};
+    allReports.forEach(item => {
+        const unit = item.unit;
+        const staffName = item.name;
+        if (unit && staffName) {
+            if (!staffByUnit[unit]) staffByUnit[unit] = new Set();
+            staffByUnit[unit].add(staffName);
+        }
+    });
+
+    const currentUnit = filterUnit.value;
+    filterUnit.innerHTML = '<option value="All">All Units</option>';
+    
+    for (const unit of Object.keys(staffByUnit).sort()) {
+        staffByUnit[unit] = Array.from(staffByUnit[unit]).sort();
+        const option = document.createElement('option');
+        option.value = unit;
+        option.textContent = unit;
+        filterUnit.appendChild(option);
+    }
+    
+    // Restore selection if it still exists
+    if (staffByUnit[currentUnit] || currentUnit === 'All') {
+        filterUnit.value = currentUnit;
+    }
+
+    filterUnit.dispatchEvent(new Event('change'));
 });
 
 function refreshUI(resetLimit = false) {

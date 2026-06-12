@@ -34,6 +34,22 @@ let unitChartInstance = null;
 
 onSnapshot(query(collection(db, "reports"), orderBy("createdAt", "desc")), (snap) => {
     allReports = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+
+    const datalist = document.getElementById('unit-filter-list');
+    if (datalist) {
+        const units = new Set();
+        allReports.forEach(r => {
+            if (r.unit) units.add(r.unit);
+        });
+        
+        datalist.innerHTML = '<option value="All">';
+        Array.from(units).sort().forEach(unit => {
+            const option = document.createElement('option');
+            option.value = unit;
+            datalist.appendChild(option);
+        });
+    }
+
     refreshUI(true);
 });
 

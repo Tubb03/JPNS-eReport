@@ -38,13 +38,6 @@
                 <input list="unit-filter-list" id="filterUnit" aria-label="Filter by Unit" placeholder="All Units" value="All"
                     class="p-2 border rounded-lg bg-white shadow-sm outline-none focus:ring-2 focus:ring-blue-400 text-sm font-semibold w-48">
                 <datalist id="unit-filter-list">
-                    <option value="All">
-                    <option value="Unit Dasar dan Latihan">
-                    <option value="Unit Pengurusan Pusat Sumber">
-                    <option value="Unit Pendidikan Digital">
-                    <option value="Unit Rakaman dan Penyiaran">
-                    <option value="Unit Pembangunan dan Bahan Interaktif">
-                    <option value="Unit Pelantar Pembelajaran">
                 </datalist>
                 <div class="flex items-center gap-2 border bg-white rounded-lg shadow-sm px-3 py-1.5 focus-within:ring-2 focus-within:ring-emerald-400 transition"
                     role="group" aria-label="Date Range Filter">

@@ -37,6 +37,21 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentLimit = 12;
     let unitChartInstance = null;
 
+    const datalist = document.getElementById('unit-filter-list');
+    if (datalist) {
+        const units = new Set();
+        allReports.forEach(r => {
+            if (r.unit) units.add(r.unit);
+        });
+        
+        datalist.innerHTML = '<option value="All">';
+        Array.from(units).sort().forEach(unit => {
+            const option = document.createElement('option');
+            option.value = unit;
+            datalist.appendChild(option);
+        });
+    }
+
     function refreshUI(resetLimit = false) {
         if (resetLimit) currentLimit = 12;
 
